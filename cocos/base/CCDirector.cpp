@@ -113,6 +113,8 @@ bool Director::init(void)
 {
     setDefaultValues();
 
+    _cocos2d_thread_id = std::this_thread::get_id();
+
     // scenes
     _runningScene = nullptr;
     _nextScene = nullptr;
@@ -1302,8 +1304,6 @@ void DisplayLinkDirector::startAnimation()
     }
 
     _invalid = false;
-
-    _cocos2d_thread_id = std::this_thread::get_id();
 
     Application::getInstance()->setAnimationInterval(_animationInterval);
 

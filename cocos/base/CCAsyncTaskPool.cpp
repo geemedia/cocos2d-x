@@ -24,6 +24,7 @@ THE SOFTWARE.
 ****************************************************************************/
 
 #include "base/CCAsyncTaskPool.h"
+#include "base/CCAutoreleasePool.h"
 
 NS_CC_BEGIN
 
@@ -50,6 +51,70 @@ AsyncTaskPool::AsyncTaskPool()
 
 AsyncTaskPool::~AsyncTaskPool()
 {
+}
+
+void AsyncTaskPool::mergeThreadManagedObjects(std::thread::id threadId)
+{
+    auto threadAutoreleasePoolIter = _managedAsyncObjectArrays.find(threadId);
+
+    if (threadAutoreleasePoolIter != _managedAsyncObjectArrays.end())
+    {
+        auto& threadAutoreleasePool = threadAutoreleasePoolIter->second;
+        auto pool = PoolManager::getInstance()->getCurrentPool();
+
+        for (auto& object : threadAutoreleasePool)
+        {
+            pool->addObject(object);
+        }
+
+        threadAutoreleasePool.clear();
+    }
+}
+
+AsyncTaskPool::ThreadTasks::ThreadTasks():
+    _stop(false)
+{
+    _thread = std::thread(
+        [this]
+    {
+        for (;;)
+        {
+            std::function<void()> task;
+            AsyncTaskCallBack callback;
+            {
+                std::unique_lock<std::mutex> lock(this->_queueMutex);
+                this->_condition.wait(lock,
+                    [this] { return this->_stop || !this->_tasks.empty(); });
+                if (this->_stop && this->_tasks.empty())
+                    return;
+                task = std::move(this->_tasks.front());
+                callback = std::move(this->_taskCallBacks.front());
+                this->_tasks.pop();
+                this->_taskCallBacks.pop();
+            }
+
+            task();
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([&, callback] { callback.callback(callback.callbackParam); });
+            auto threadId = std::this_thread::get_id();
+            Director::getInstance()->getScheduler()->performFunctionInCocosThread([threadId] { AsyncTaskPool::getInstance()->mergeThreadManagedObjects(threadId); });
+        }
+    }
+    );
+}
+
+AsyncTaskPool::ThreadTasks::~ThreadTasks()
+{
+    {
+        std::unique_lock<std::mutex> lock(_queueMutex);
+        _stop = true;
+
+        while (_tasks.size())
+            _tasks.pop();
+        while (_taskCallBacks.size())
+            _taskCallBacks.pop();
+    }
+    _condition.notify_all();
+    _thread.join();
 }
 
 NS_CC_END

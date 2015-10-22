@@ -74,6 +74,7 @@ option(USE_BOX2D "Use box2d for physics library" OFF)
 option(USE_BULLET "Use bullet for physics3d library" ON)
 option(USE_RECAST "Use Recast for navigation mesh" ON)
 option(USE_WEBP "Use WebP codec" ${USE_WEBP_DEFAULT})
+option(ASYNC_AUTORELEASE "Enables the delayed garbage collection mechanism." OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(DEBUG_MODE "Debug or release?" ON)
 option(BUILD_EXTENSIONS "Build extension library" ON)
@@ -125,6 +126,10 @@ else()
 endif(MSVC)
 
 set(COCOS_EXTERNAL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external)
+
+if(ASYNC_AUTORELEASE)
+	add_definitions(-DCOCOS2D_ASYNC_AUTORELEASE)
+endif()
 
 # Some macro definitions
 if(WINDOWS)
