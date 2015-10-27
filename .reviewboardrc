@@ -1,0 +1,2 @@
+REVIEWBOARD_URL = 'http://reviews.dtisoft.com/'
+REPOSITORY = 'git - cocos2d-x'
