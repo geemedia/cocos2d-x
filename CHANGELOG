@@ -1,3 +1,13 @@
+cocos2d-x-3.9.0-gee-2 January 22 2016
+
+[NEW]           Added gamepad support in dodo, a new prebuild was then necessary.
+
+cocos2d-x-3.9.0-gee-1 November 27 2015
+
+[FIX]           Signature for CWin32InputBox::DlgProc was incorrect for MinGW.
+[NEW]           Added a delayed garbage collection mechanism in the threads of the async task pool so we can create autoreleased objects from a background thread.
+[FIX]           Fixed build for mingw and android in CMake.
+
 cocos2d-x-3.9 beta0 October.20 2015
 
 [NEW]           Label: Added line spacing/leading feature to Label.
@@ -50,7 +60,7 @@ cocos2d-x-3.9 beta0 October.20 2015
 [FIX]           3D: Added the missing CCMotionStreak3D files.
 [FIX]           3D: Fixed a bug in CCPhysics3DComponent.cpp that oldBool is set with a wrong value.
 [FIX]           3D: Fixed shader light parameter bug that caused for that all the mesh share light parameter.
-[FIX]           Sprite: Fixed a bug that CC_SPRITE_DEBUG_DRAW did nothing in Cocos2d-x. 
+[FIX]           Sprite: Fixed a bug that CC_SPRITE_DEBUG_DRAW did nothing in Cocos2d-x.
 [FIX]           Button: Fixed an issue that when image size of variable button status texture are different, Helper::restrictCapInsetRect result may stop the pressed & disabled status picture from loading.
 [FIX]           Font: Fixed a crash bug in destructor of FontFreeType.
 [FIX]           Label: Removed scale factor for label shadow.
@@ -60,7 +70,7 @@ cocos2d-x-3.9 beta0 October.20 2015
 [FIX]           Particle: Fixed a bug of nomalize_point which caused particle rendering error.
 [FIX]           Tilemap: Fixed a TMXLayer bug: When using float values (for example the actual position of the character) to get the current tile, the wrong tile is sometimes/usually returned.
 [FIX]           Animate: Fixed a crash bug when csb file is broken.
-[FIX]           Animate: Fixed a bug that a same frame index is inserted after animation speed is scaled. 
+[FIX]           Animate: Fixed a bug that a same frame index is inserted after animation speed is scaled.
 [FIX]           Animate: Fixed bug in v1.6 that bone animation crashed when performing getBoneAtPoint(0,0).
 [FIX]           Animate: Fixed crash when recall a cached timeline after scene exited.
 [FIX]           Animate: Fixed debug-config crash if a FrameBuffer has no RenderTargetDepthStencil.
@@ -127,9 +137,9 @@ cocos2d-x-3.9 beta0 October.20 2015
 cocos2d-x-3.8 final September.6 2015
 cocos2d-x-3.8 rc0   August.26 2015
 cocos2d-x-3.8 beta0 August.14 2015
-    
+
     [HIGHLIGHT]     3D: Added 3d physics collider
-    [HIGHLIGHT]     3D: Supported setting camera background brushes with color/depth/skybox 
+    [HIGHLIGHT]     3D: Supported setting camera background brushes with color/depth/skybox
     [HIGHLIGHT]     3D: Added key frame event Callback in Animate3D
     [HIGHLIGHT]     FileUtils: Added a set of file writing APIs: writeStringToFile, writeDataToFile, writeValueMapToFile, writeValueVectorToFile
     [HIGHLIGHT]     UI: Refined UI system
@@ -162,7 +172,7 @@ cocos2d-x-3.8 beta0 August.14 2015
 
     [REFINE]        3D: Supported composite 2D/3D scene by moving UI and camera far away
     [REFINE]        3D: Improved Particle3D performance
-    [REFINE]        3D: Made SkyBox not transparent 
+    [REFINE]        3D: Made SkyBox not transparent
     [REFINE]        3D: Enable depth write for SkyBox
     [REFINE]        3D: Enable depth write for transparent object
     [REFINE]        3D: Set depth test function of Skybox brush to always
@@ -183,7 +193,7 @@ cocos2d-x-3.8 beta0 August.14 2015
     [REFINE]        UI: Improved event handling in TextField
     [REFINE]        studio: Avoid CSLoader from openning csb file multiple times with fopen
     [REFINE]        studio: Added BlendFrame support to Skeleton Animation
-    [REFINE]        studio: Enabled blendfunc cascade to the skin of BoneNode 
+    [REFINE]        studio: Enabled blendfunc cascade to the skin of BoneNode
     [REFINE]        studio: Update reader with parse logic for valid attribute of SkyBox
     [REFINE]        FileUtils: Remove old path while adding existing search path
     [REFINE]        Device: Implemented Device::getDPI for Mac
@@ -437,7 +447,7 @@ cocos2d-x-3.7rc0  July.1 2015
     [HIGHLIGHT]     JS: Merged JSB and web engine into Cocos2d-x for a All-in-one engine
     [HIGHLIGHT]     JS: Added `ccui.VideoPlayer` and `ccui.WebView` for iOS/Android/Web
     [HIGHLIGHT]     console: Supported build & run Android Studio project with cocos console
-    
+
     [NEW]           C++: Added ActionFloat
     [NEW]           C++: Supported physical keyboard on WinRT
     [NEW]           FileUtils: checked filename case characters on windows
@@ -470,7 +480,7 @@ cocos2d-x-3.7rc0  July.1 2015
     [REFINE]        web: Deleted the redundant variables defined and log informations in ccui.RichText
     [REFINE]        web: Allowed timeline animations with only one frame
     [REFINE]        web: Improved property declaration of cc.Texture2D
-    
+
     [FIX]           core: Fixed `Director::setClearColor` has no effect bug
     [FIX]           platform: Fixed VideoPlayer on Android ignore search paths
     [FIX]           platform: Fixed crash while using s3tc on Nexus 9 (Android 5.0.1)
@@ -507,7 +517,7 @@ cocos2d-x-3.7rc0  July.1 2015
     [FIX]           Label: outline effect doesn't match characters well
     [FIX]           Label: Fixed system font label line height calculation is wrong  on Android.
     [FIX]           Label: Fixed IllegalArgumentException on Android 2.3.x
-    [FIX]           Label: Fixed line wrap error without space. 
+    [FIX]           Label: Fixed line wrap error without space.
     [FIX]           Label: The texture of character have not cropped if character cross the axis-aligned bounding-box
     [FIX]           Label: Fixed the top of character's texture may be tailored if enable outline effect
     [FIX]           ProgressTimer: `setSprite()` doesn't take effect
@@ -638,7 +648,7 @@ cocos2d-x-3.5 Mar.23 2015
 cocos2d-x-3.5rc0 Mar.13 2015
     [NEW]           CocosStudio: add callback when loading a CSB file
     [NEW]           Particle3D: more Particle Universe features are supported, add observers and event handlers
-    
+
     [FIX]           Billboard: fix bug on transparent Billboard because of transparent queue
     [FIX]           Bundle: bug that create bundle with empty path
     [FIX]           Camera: camera is detroyed unexpectedly when call removeAllChildren
@@ -661,7 +671,7 @@ cocos2d-x-3.5beta0  Feb.27 2015
     [FIX]           HttpClient: if the request data is started by a null character, it does not fill http body
     [FIX]           HttpClient: memory leak on iOS
     [FIX]           Sprite3D: `getAttachNode()` will fail when there is no bone with name
-    
+
 cocos2d-x-3.4 Jan.30 2015
     [FIX]           Animate3D: `setSpeed` has not effect if `Animate3D` is used in Sequence
     [FIX]           C++: will crash if built with armeabi-v7a enabled on Android devices that with armeabi-v7a architecture but doesn't support NEON instructions
@@ -674,7 +684,7 @@ cocos2d-x-3.4 Jan.30 2015
     [FIX]           Label: labels will become white block after resume from background on some Android devices, such as xiaomi3
     [FIX]           Label: improved parsing performance of bitmap font
     [FIX]           Label: can not display `&` if using system font on windows
-    [FIX]           Lua-binding:studio-support: AnimationInfo is not binded 
+    [FIX]           Lua-binding:studio-support: AnimationInfo is not binded
     [FIX]           New audio: not close file descriptor leads to that may causes game freeze if playing two many times(may be more than 1000) on Android
     [FIX]           Node: anchor point has not effect to rotation, it always rotate along (0, 0)
     [FIX]           Physics integration: Scale9Sprite can't run `Move` action and `Scale` action if used physical scene
@@ -688,12 +698,12 @@ cocos2d-x-3.4 Jan.30 2015
     [FIX]           UI::WebView: base URL can not work
 
 cocos2d-x-3.4rc1 Jan.15 2015
-    [NEW]           C++: added CC_USE_CULLING macro to control if enable auto culling or not 
+    [NEW]           C++: added CC_USE_CULLING macro to control if enable auto culling or not
     [NEW]           FileUtils::fullPathForFilename will return empty string when file can not be found
     [NEW]           VertexBuffer&IndexBuffer: allow setting usage(GL_STATIC_DRAW or GL_DYNAMIC_DRAW) in create method
     [NEW]           Renderer: 3D rendering support for 2d objects
-    
-    [FIX]           DrawNode: fix random crash because of init opengl buffer wrongly 
+
+    [FIX]           DrawNode: fix random crash because of init opengl buffer wrongly
     [FIX]           DrawNode: drawPoints() can not set ponit size
     [FIX]           EventDispatcher: crash if adding/removing event listeners and dispatching event in event callback function
     [FIX]           GLProgramState: may cause GL_INVALID_VALUE error at start up on Android
@@ -704,7 +714,7 @@ cocos2d-x-3.4rc1 Jan.15 2015
 cocos2d-x-3.4rc0  Jan.9 2015
     [NEW]           3rd: update libcurl to v7.39
     [NEW]           3rd: update luajit to v2.0.3
-    
+
     [FIX]           C++: crash when run clang static analyzer in Xcode
     [FIX]           DrawNode: can not set color when DrawPoints, wrong behavior of drawRect
     [FIX]           FileUtils: getData() can't get data from file when file was using by other application on windows
@@ -751,7 +761,7 @@ cocos2d-x-3.3-rc2  Dec.5 2014
     [FIX]           C++: use 100% of one core on Windows
     [FIX]           Label: when a label is added to a invisible parent node, app will crash if switching from background
     [FIX]           Label: label will not be shown when using system font on Mac
-    [FIX]           Studio reader: replace protocol buffer with flatbuffer 
+    [FIX]           Studio reader: replace protocol buffer with flatbuffer
 
 cocos2d-x-3.3-rc1  Nov.29 2014
     [NEW]           Vec2: added greater than operator
