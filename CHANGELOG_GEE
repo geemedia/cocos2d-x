@@ -1,0 +1,13 @@
+cocos2d-x-3.10.0-gee-1 February 01 2016
+
+[FIX]           Temporarily turned off js-tests on Release configuration for Visual Studio due to linking error (ref. cocos2d-x issue #15000).
+
+cocos2d-x-3.9.0-gee-2 January 22 2016
+
+[NEW]           Added gamepad support in dodo, a new prebuild was then necessary.
+
+cocos2d-x-3.9.0-gee-1 November 27 2015
+
+[FIX]           Signature for CWin32InputBox::DlgProc was incorrect for MinGW.
+[NEW]           Added a delayed garbage collection mechanism in the threads of the async task pool so we can create autoreleased objects from a background thread.
+[FIX]           Fixed build for mingw and android in CMake.
