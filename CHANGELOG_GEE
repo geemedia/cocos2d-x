@@ -1,5 +1,6 @@
 cocos2d-x-3.10.0-gee-1 February 01 2016
 
+[FIX]           Applied change b0d0a7a0641fed05b6ecc4ea4bebdb3617879ee1 from cocos2d-x repo (fix to PageView - issue # 14964). To be added by them on version 3.11.
 [FIX]           Temporarily turned off js-tests on Release configuration for Visual Studio due to linking error (ref. cocos2d-x issue #15000).
 
 cocos2d-x-3.9.0-gee-2 January 22 2016
