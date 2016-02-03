@@ -8,6 +8,9 @@ if [ ! $(command -v apt-get) ]; then
   exit 0
 fi
 
+#Copy fmod so the correct symbolic link is created, to be removed when it will be fixed in cocos2d-x.
+sudo cp ${COCOS2D}/external/linux-specific/fmod/prebuilt/64-bit/libfmod.so /usr/local/lib/
+
 #install g++-4.9
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 sudo apt-get update
