@@ -25,7 +25,7 @@
 
 #include "UIEditBoxImpl-linux.h"
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX) && !defined(LINUX_ARM)
 
 #include "UIEditBox.h"
 #include "2d/CCLabel.h"
@@ -117,4 +117,3 @@ void EditBoxImplLinux::nativeOpenKeyboard()
 NS_CC_END
 
 #endif /* #if (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX) */
-

@@ -31,8 +31,8 @@
 #include <functional>
 #include <iostream>
 #include <map>
-#include "fmod.hpp"
-#include "fmod_errors.h"
+//#include "fmod.hpp"
+//#include "fmod_errors.h"
 #include "AudioEngine.h"
 
 #include "base/CCRef.h"
@@ -71,14 +71,14 @@ public:
     /**
      * used internally by ffmod callback 
      */ 
-    void onSoundFinished(FMOD::Channel * channel); 
+    //void onSoundFinished(FMOD::Channel * channel); 
     
 private:
   
     /**
     * returns null if a sound with the given path is not found
     */
-    FMOD::Sound * findSound(const std::string &path);
+    /*FMOD::Sound * findSound(const std::string &path);
   
     FMOD::Channel * getChannel(FMOD::Sound *);
   
@@ -96,7 +96,7 @@ private:
     
     std::map<std::string, FMOD::Sound *> mapSound;  
     
-    FMOD::System* pSystem;
+    FMOD::System* pSystem;*/
     
 };
 }

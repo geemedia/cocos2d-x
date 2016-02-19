@@ -219,7 +219,7 @@ void StencilStateManager::onBeforeVisit()
     // enable alpha test only if the alpha threshold < 1,
     // indeed if alpha threshold == 1, every pixel will be drawn anyways
     if (_alphaThreshold < 1) {
-#if !CC_CLIPPING_NODE_OPENGLES
+#if !CC_CLIPPING_NODE_OPENGLES && !defined(GL_ES_VERSION_2_0)
         // manually save the alpha test state
         _currentAlphaTestEnabled = glIsEnabled(GL_ALPHA_TEST);
         glGetIntegerv(GL_ALPHA_TEST_FUNC, (GLint *)&_currentAlphaTestFunc);
@@ -241,7 +241,7 @@ void StencilStateManager::onAfterDrawStencil()
     // restore alpha test state
     if (_alphaThreshold < 1)
     {
-#if CC_CLIPPING_NODE_OPENGLES
+#if CC_CLIPPING_NODE_OPENGLES || GL_ES_VERSION_2_0
         // FIXME: we need to find a way to restore the shaders of the stencil node and its children
 #else
         // manually restore the alpha test state

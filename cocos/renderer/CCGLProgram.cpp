@@ -440,7 +440,7 @@ bool GLProgram::compileShader(GLuint* shader, GLenum type, const GLchar* source,
     const GLchar *sources[] = {
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WINRT
         (type == GL_VERTEX_SHADER ? "precision mediump float;\n precision mediump int;\n" : "precision mediump float;\n precision mediump int;\n"),
-#elif (CC_TARGET_PLATFORM != CC_PLATFORM_WIN32 && CC_TARGET_PLATFORM != CC_PLATFORM_LINUX && CC_TARGET_PLATFORM != CC_PLATFORM_MAC)
+#elif (CC_TARGET_PLATFORM != CC_PLATFORM_WIN32 && (CC_TARGET_PLATFORM != CC_PLATFORM_LINUX || defined(GL_ES_VERSION_2_0)) && CC_TARGET_PLATFORM != CC_PLATFORM_MAC)
         (type == GL_VERTEX_SHADER ? "precision highp float;\n precision highp int;\n" : "precision mediump float;\n precision mediump int;\n"),
 #endif
         COCOS2D_SHADER_UNIFORMS,
@@ -455,7 +455,7 @@ bool GLProgram::compileShader(GLuint* shader, GLenum type, const GLchar* source,
 
     if (! status)
     {
-        GLsizei length;
+        GLsizei length = 0;
         glGetShaderiv(*shader, GL_SHADER_SOURCE_LENGTH, &length);
         GLchar* src = (GLchar *)malloc(sizeof(GLchar) * length);
 

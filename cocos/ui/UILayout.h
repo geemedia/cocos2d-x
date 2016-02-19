@@ -111,7 +111,7 @@ public:
  * - Relative layout: child elements are arranged relative to certain rules.
  *
  */
-class CC_GUI_DLL Layout : public Widget, public LayoutProtocol
+class CC_GUI_DLL Layout : public LayoutProtocol, public Widget
 {
     
     DECLARE_CLASS_GUI_INFO

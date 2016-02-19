@@ -185,12 +185,17 @@ endif()
 
 # desktop platforms
 if(LINUX OR MACOSX OR WINDOWS)
-  cocos_find_package(OpenGL OPENGL REQUIRED)
+  if(LINUX_ARM)
+    cocos_find_package(GLES GLES REQUIRED)
+    add_definitions(-DGLFW_INCLUDE_ES2=1)
+  else()
+    cocos_find_package(OpenGL OPENGL REQUIRED)
 
-  if(LINUX OR WINDOWS)
-    cocos_find_package(GLEW GLEW REQUIRED)
-    #TODO: implement correct schema for pass cocos2d specific requirements to projects
-    include_directories(${GLEW_INCLUDE_DIRS})
+    if(LINUX OR WINDOWS)
+      cocos_find_package(GLEW GLEW REQUIRED)
+      #TODO: implement correct schema for pass cocos2d specific requirements to projects
+      include_directories(${GLEW_INCLUDE_DIRS})
+    endif()
   endif()
 
   cocos_find_package(GLFW3 GLFW3 REQUIRED)
@@ -201,9 +206,13 @@ if(LINUX OR MACOSX OR WINDOWS)
     find_package(Threads REQUIRED)
     set(THREADS_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
 
-    cocos_find_package(FMOD FMOD REQUIRED)
-    cocos_find_package(Fontconfig FONTCONFIG REQUIRED)
-    cocos_find_package(GTK3 GTK3 REQUIRED)
+    if(LINUX_ARM)
+      cocos_find_package(Fontconfig FONTCONFIG REQUIRED)
+    else()
+      cocos_find_package(FMOD FMOD REQUIRED)
+      cocos_find_package(Fontconfig FONTCONFIG REQUIRED)
+      cocos_find_package(GTK3 GTK3 REQUIRED)
+    endif()
   endif()
 
   if(WINDOWS)

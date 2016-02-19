@@ -74,7 +74,7 @@ typedef void (Ref::*SEL_TouchEvent)(Ref*,TouchEventType);
  * This class inherent from `ProtectedNode` and `LayoutParameterProtocol`.
  * If you want to implements your own ui widget, you should subclass it.
  */
-class CC_GUI_DLL Widget : public ProtectedNode, public LayoutParameterProtocol
+class CC_GUI_DLL Widget : public LayoutParameterProtocol, public ProtectedNode
 {
 public:
     /**
