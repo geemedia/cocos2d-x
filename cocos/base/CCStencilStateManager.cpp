@@ -29,7 +29,7 @@
 #include "renderer/ccGLStateCache.h"
 #include "renderer/CCRenderer.h"
 #include "renderer/CCRenderState.h"
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_MAC || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_MAC || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX && !defined(GL_ES_VERSION_2_0)))
 #define CC_CLIPPING_NODE_OPENGLES 0
 #else
 #define CC_CLIPPING_NODE_OPENGLES 1
@@ -219,7 +219,7 @@ void StencilStateManager::onBeforeVisit()
     // enable alpha test only if the alpha threshold < 1,
     // indeed if alpha threshold == 1, every pixel will be drawn anyways
     if (_alphaThreshold < 1) {
-#if !CC_CLIPPING_NODE_OPENGLES && !defined(GL_ES_VERSION_2_0)
+#if !CC_CLIPPING_NODE_OPENGLES
         // manually save the alpha test state
         _currentAlphaTestEnabled = glIsEnabled(GL_ALPHA_TEST);
         glGetIntegerv(GL_ALPHA_TEST_FUNC, (GLint *)&_currentAlphaTestFunc);
@@ -241,7 +241,7 @@ void StencilStateManager::onAfterDrawStencil()
     // restore alpha test state
     if (_alphaThreshold < 1)
     {
-#if CC_CLIPPING_NODE_OPENGLES || GL_ES_VERSION_2_0
+#if CC_CLIPPING_NODE_OPENGLES
         // FIXME: we need to find a way to restore the shaders of the stencil node and its children
 #else
         // manually restore the alpha test state
