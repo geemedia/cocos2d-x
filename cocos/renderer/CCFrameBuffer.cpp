@@ -347,6 +347,13 @@ FrameBuffer* FrameBuffer::create(uint8_t fid, unsigned int width, unsigned int h
 
 bool FrameBuffer::init(uint8_t fid, unsigned int width, unsigned int height)
 {
+#if CC_DISABLE_GL_FRAMEBUFFER
+    CC_UNUSED_PARAM(fid);
+    CC_UNUSED_PARAM(width);
+    CC_UNUSED_PARAM(height);
+
+    return false;
+#else
     _fid = fid;
     _width = width;
     _height = height;
@@ -377,6 +384,7 @@ bool FrameBuffer::init(uint8_t fid, unsigned int width, unsigned int height)
     Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(_dirtyFBOListener, -1);
 #endif
     return true;
+#endif
 }
 
 FrameBuffer::FrameBuffer()
@@ -400,7 +408,11 @@ FrameBuffer::~FrameBuffer()
     {
         CC_SAFE_RELEASE_NULL(_rt);
         CC_SAFE_RELEASE_NULL(_rtDepthStencil);
+
+#if !CC_DISABLE_GL_FRAMEBUFFER
         glDeleteFramebuffers(1, &_fbo);
+#endif
+
         _fbo = 0;
         _frameBuffers.erase(this);
 #if CC_ENABLE_CACHE_TEXTURE_DATA
@@ -442,6 +454,7 @@ void FrameBuffer::attachRenderTarget(RenderTargetBase* rt)
 
 void FrameBuffer::applyFBO()
 {
+#if !CC_DISABLE_GL_FRAMEBUFFER
     CHECK_GL_ERROR_DEBUG();
     glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
     CHECK_GL_ERROR_DEBUG();
@@ -465,6 +478,7 @@ void FrameBuffer::applyFBO()
         CCLOG("FrameBuffer Status Error %d", (int)glCheckFramebufferStatus(GL_FRAMEBUFFER));
     }
     CHECK_GL_ERROR_DEBUG();
+#endif
 }
 
 void FrameBuffer::attachDepthStencilTarget(RenderTargetDepthStencil* rt)

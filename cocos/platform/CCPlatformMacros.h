@@ -100,6 +100,17 @@ CC_DEPRECATED_ATTRIBUTE static __TYPE__* node() \
     #define CC_REBIND_INDICES_BUFFER  0
 #endif
 
+ /** @def CC_DISABLE_GL_FRAMEBUFFER
+ * Set to 1 for platforms that do not properly support OpenGL frame buffer objects (FBO).
+ *
+ * @since v3.10.0-gee.3
+ */
+#if (true)  // FIXME: Test for xseries-xwin.
+#define CC_DISABLE_GL_FRAMEBUFFER       1
+#else
+#define CC_DISABLE_GL_FRAMEBUFFER       0
+#endif
+
 // Generic macros
 
 /// @name namespace cocos2d
