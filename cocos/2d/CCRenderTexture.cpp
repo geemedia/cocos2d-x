@@ -562,7 +562,7 @@ Image* RenderTexture::newImage(bool fliimage)
 
 void RenderTexture::onBegin()
 {
-#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECTCC_DISABLE_GL_FRAMEBUFFER
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     //
     Director *director = Director::getInstance();
     
