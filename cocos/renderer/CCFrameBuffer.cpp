@@ -150,7 +150,7 @@ RenderTargetRenderBuffer::RenderTargetRenderBuffer()
 
 RenderTargetRenderBuffer::~RenderTargetRenderBuffer()
 {
-#if !CC_DISABLE_GL_RENDERBUFFER
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     if(glIsRenderbuffer(_colorBuffer))
     {
         glDeleteRenderbuffers(1, &_colorBuffer);
@@ -164,7 +164,7 @@ RenderTargetRenderBuffer::~RenderTargetRenderBuffer()
 
 bool RenderTargetRenderBuffer::init(unsigned int width, unsigned int height)
 {
-#if CC_DISABLE_GL_FRAMEBUFFER || CC_DISABLE_GL_RENDERBUFFER
+#if CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     return false;
 #else
     if(!RenderTargetBase::init(width, height)) return false;
@@ -227,7 +227,7 @@ RenderTargetDepthStencil::RenderTargetDepthStencil()
 
 RenderTargetDepthStencil::~RenderTargetDepthStencil()
 {
-#if !CC_DISABLE_GL_RENDERBUFFER
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     if(glIsRenderbuffer(_depthStencilBuffer))
     {
         glDeleteRenderbuffers(1, &_depthStencilBuffer);
@@ -241,7 +241,7 @@ RenderTargetDepthStencil::~RenderTargetDepthStencil()
 
 bool RenderTargetDepthStencil::init(unsigned int width, unsigned int height)
 {
-#if CC_DISABLE_GL_RENDERBUFFER
+#if CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     return false;
 #else
     if(!RenderTargetBase::init(width, height)) return false;
@@ -359,7 +359,7 @@ FrameBuffer* FrameBuffer::create(uint8_t fid, unsigned int width, unsigned int h
 
 bool FrameBuffer::init(uint8_t fid, unsigned int width, unsigned int height)
 {
-#if CC_DISABLE_GL_FRAMEBUFFER
+#if CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     CC_UNUSED_PARAM(fid);
     CC_UNUSED_PARAM(width);
     CC_UNUSED_PARAM(height);
@@ -421,7 +421,7 @@ FrameBuffer::~FrameBuffer()
         CC_SAFE_RELEASE_NULL(_rt);
         CC_SAFE_RELEASE_NULL(_rtDepthStencil);
 
-#if !CC_DISABLE_GL_FRAMEBUFFER
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
         glDeleteFramebuffers(1, &_fbo);
 #endif
 
@@ -466,7 +466,7 @@ void FrameBuffer::attachRenderTarget(RenderTargetBase* rt)
 
 void FrameBuffer::applyFBO()
 {
-#if !CC_DISABLE_GL_FRAMEBUFFER
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     CHECK_GL_ERROR_DEBUG();
     glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
     CHECK_GL_ERROR_DEBUG();

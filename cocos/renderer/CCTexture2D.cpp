@@ -1215,7 +1215,7 @@ void Texture2D::PVRImagesHavePremultipliedAlpha(bool haveAlphaPremultiplied)
 
 void Texture2D::generateMipmap()
 {
-#if !CC_DISABLE_GL_FRAMEBUFFER
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     CCASSERT(_pixelsWide == ccNextPOT(_pixelsWide) && _pixelsHigh == ccNextPOT(_pixelsHigh), "Mipmap texture only works in POT textures");
     GL::bindTexture2D( _name );
     glGenerateMipmap(GL_TEXTURE_2D);

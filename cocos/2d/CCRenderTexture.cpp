@@ -76,11 +76,9 @@ RenderTexture::~RenderTexture()
     CC_SAFE_RELEASE(_sprite);
     CC_SAFE_RELEASE(_textureCopy);
     
-#if !CC_DISABLE_GL_FRAMEBUFFER
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     glDeleteFramebuffers(1, &_FBO);
-#endif
 
-#if !CC_DISABLE_GL_RENDERBUFFER
     if (_depthRenderBufffer)
     {
         glDeleteRenderbuffers(1, &_depthRenderBufffer);
@@ -115,7 +113,7 @@ void RenderTexture::listenToBackground(EventCustom *event)
         CCLOG("Cache rendertexture failed!");
     }
     
-#if !CC_DISABLE_GL_FRAMEBUFFER
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     glDeleteFramebuffers(1, &_FBO);
 #endif
     _FBO = 0;
@@ -124,7 +122,7 @@ void RenderTexture::listenToBackground(EventCustom *event)
 
 void RenderTexture::listenToForeground(EventCustom *event)
 {
-#if CC_ENABLE_CACHE_TEXTURE_DATA && !CC_DISABLE_GL_FRAMEBUFFER
+#if CC_ENABLE_CACHE_TEXTURE_DATA && !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     // -- regenerate frame buffer object and attach the texture
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &_oldFBO);
     
@@ -189,7 +187,7 @@ bool RenderTexture::initWithWidthAndHeight(int w, int h, Texture2D::PixelFormat 
 
 bool RenderTexture::initWithWidthAndHeight(int w, int h, Texture2D::PixelFormat format, GLuint depthStencilFormat)
 {
-#if CC_DISABLE_GL_FRAMEBUFFER || CC_DISABLE_GL_RENDERBUFFER
+#if CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     CC_UNUSED_PARAM(w);
     CC_UNUSED_PARAM(h);
     CC_UNUSED_PARAM(format);
@@ -481,7 +479,7 @@ void RenderTexture::onSaveToFile(const std::string& filename, bool isRGBA)
 /* get buffer as Image */
 Image* RenderTexture::newImage(bool fliimage)
 {
-#if CC_DISABLE_GL_FRAMEBUFFER
+#if CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     CC_UNUSED_PARAM(fliimage);
 
     CCASSERT(0, "framebuffer unsupported");
@@ -564,7 +562,7 @@ Image* RenderTexture::newImage(bool fliimage)
 
 void RenderTexture::onBegin()
 {
-#if !CC_DISABLE_GL_FRAMEBUFFER
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECTCC_DISABLE_GL_FRAMEBUFFER
     //
     Director *director = Director::getInstance();
     
@@ -623,7 +621,7 @@ void RenderTexture::onBegin()
 
 void RenderTexture::onEnd()
 {
-#if !CC_DISABLE_GL_FRAMEBUFFER
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     Director *director = Director::getInstance();
 
     glBindFramebuffer(GL_FRAMEBUFFER, _oldFBO);
