@@ -150,6 +150,7 @@ RenderTargetRenderBuffer::RenderTargetRenderBuffer()
 
 RenderTargetRenderBuffer::~RenderTargetRenderBuffer()
 {
+#if !CC_DISABLE_GL_RENDERBUFFER
     if(glIsRenderbuffer(_colorBuffer))
     {
         glDeleteRenderbuffers(1, &_colorBuffer);
@@ -158,10 +159,14 @@ RenderTargetRenderBuffer::~RenderTargetRenderBuffer()
 #if CC_ENABLE_CACHE_TEXTURE_DATA
     Director::getInstance()->getEventDispatcher()->removeEventListener(_reBuildRenderBufferListener);
 #endif
+#endif
 }
 
 bool RenderTargetRenderBuffer::init(unsigned int width, unsigned int height)
 {
+#if CC_DISABLE_GL_FRAMEBUFFER || CC_DISABLE_GL_RENDERBUFFER
+    return false;
+#else
     if(!RenderTargetBase::init(width, height)) return false;
     GLint oldRenderBuffer(0);
     glGetIntegerv(GL_RENDERBUFFER_BINDING, &oldRenderBuffer);
@@ -191,6 +196,7 @@ bool RenderTargetRenderBuffer::init(unsigned int width, unsigned int height)
 #endif
     
     return true;
+#endif
 }
 
 
@@ -221,6 +227,7 @@ RenderTargetDepthStencil::RenderTargetDepthStencil()
 
 RenderTargetDepthStencil::~RenderTargetDepthStencil()
 {
+#if !CC_DISABLE_GL_RENDERBUFFER
     if(glIsRenderbuffer(_depthStencilBuffer))
     {
         glDeleteRenderbuffers(1, &_depthStencilBuffer);
@@ -229,10 +236,14 @@ RenderTargetDepthStencil::~RenderTargetDepthStencil()
 #if CC_ENABLE_CACHE_TEXTURE_DATA
     Director::getInstance()->getEventDispatcher()->removeEventListener(_reBuildDepthStencilListener);
 #endif
+#endif
 }
 
 bool RenderTargetDepthStencil::init(unsigned int width, unsigned int height)
 {
+#if CC_DISABLE_GL_RENDERBUFFER
+    return false;
+#else
     if(!RenderTargetBase::init(width, height)) return false;
     GLint oldRenderBuffer(0);
     glGetIntegerv(GL_RENDERBUFFER_BINDING, &oldRenderBuffer);
@@ -261,6 +272,7 @@ bool RenderTargetDepthStencil::init(unsigned int width, unsigned int height)
 #endif
     
     return true;
+#endif
 }
 
 

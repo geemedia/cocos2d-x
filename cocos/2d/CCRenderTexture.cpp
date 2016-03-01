@@ -80,10 +80,13 @@ RenderTexture::~RenderTexture()
     glDeleteFramebuffers(1, &_FBO);
 #endif
 
+#if !CC_DISABLE_GL_RENDERBUFFER
     if (_depthRenderBufffer)
     {
         glDeleteRenderbuffers(1, &_depthRenderBufffer);
     }
+#endif
+
     CC_SAFE_DELETE(_UITextureImage);
 }
 
@@ -186,7 +189,7 @@ bool RenderTexture::initWithWidthAndHeight(int w, int h, Texture2D::PixelFormat 
 
 bool RenderTexture::initWithWidthAndHeight(int w, int h, Texture2D::PixelFormat format, GLuint depthStencilFormat)
 {
-#if CC_DISABLE_GL_FRAMEBUFFER
+#if CC_DISABLE_GL_FRAMEBUFFER || CC_DISABLE_GL_RENDERBUFFER
     CC_UNUSED_PARAM(w);
     CC_UNUSED_PARAM(h);
     CC_UNUSED_PARAM(format);

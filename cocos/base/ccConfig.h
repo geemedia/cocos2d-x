@@ -380,4 +380,7 @@ THE SOFTWARE.
 # define CC_ALLOCATOR_GLOBAL_NEW_DELETE cocos2d::allocator::AllocatorStrategyGlobalSmallBlock
 #endif
 
+#define CC_DISABLE_GL_RENDERBUFFER 1
+#define CC_DISABLE_GL_FRAMEBUFFER 1
+
 #endif // __CCCONFIG_H__
