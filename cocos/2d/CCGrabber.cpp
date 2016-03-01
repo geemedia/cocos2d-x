@@ -35,12 +35,18 @@ Grabber::Grabber(void)
 {
     memset(_oldClearColor, 0, sizeof(_oldClearColor));
 
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     // generate FBO
     glGenFramebuffers(1, &_FBO);
+#endif
 }
 
 void Grabber::grab(Texture2D *texture)
 {
+#if CC_DISABLE_GL_FRAMEBUFFER_OBJECT
+    CC_UNUSED_PARAM(texture);
+    CCASSERT(0, "Frame Grabber: framebuffer is unsupported");
+#else
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &_oldFBO);
 
     // bind
@@ -57,12 +63,14 @@ void Grabber::grab(Texture2D *texture)
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, _oldFBO);
+#endif
 }
 
 void Grabber::beforeRender(Texture2D *texture)
 {
     CC_UNUSED_PARAM(texture);
 
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &_oldFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, _FBO);
     
@@ -79,23 +87,29 @@ void Grabber::beforeRender(Texture2D *texture)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 //  glColorMask(true, true, true, false);    // #631
+#endif
 }
 
 void Grabber::afterRender(cocos2d::Texture2D *texture)
 {
     CC_UNUSED_PARAM(texture);
 
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     glBindFramebuffer(GL_FRAMEBUFFER, _oldFBO);
 //  glColorMask(true, true, true, true);    // #631
     
     // Restore clear color
     glClearColor(_oldClearColor[0], _oldClearColor[1], _oldClearColor[2], _oldClearColor[3]);
+#endif
 }
 
 Grabber::~Grabber()
 {
     CCLOGINFO("deallocing Grabber: %p", this);
+
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     glDeleteFramebuffers(1, &_FBO);
+#endif
 }
 
 NS_CC_END
