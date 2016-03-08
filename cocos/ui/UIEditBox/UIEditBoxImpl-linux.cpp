@@ -25,7 +25,7 @@
 
 #include "UIEditBoxImpl-linux.h"
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX) && !CC_OPENGL1_ONLY //TODO: FDP-5141 use correct feature flag
 
 #include "UIEditBox.h"
 #include "2d/CCLabel.h"
