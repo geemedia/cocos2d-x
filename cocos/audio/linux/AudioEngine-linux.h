@@ -71,14 +71,17 @@ public:
     /**
      * used internally by ffmod callback 
      */ 
-    //void onSoundFinished(FMOD::Channel * channel); 
-    
+#ifndef LINUX_ARM
+    void onSoundFinished(FMOD::Channel * channel); 
+#endif
+
 private:
-  
+
+#ifndef LINUX_ARM
     /**
     * returns null if a sound with the given path is not found
     */
-    /*FMOD::Sound * findSound(const std::string &path);
+    FMOD::Sound * findSound(const std::string &path);
   
     FMOD::Channel * getChannel(FMOD::Sound *);
   
@@ -96,11 +99,10 @@ private:
     
     std::map<std::string, FMOD::Sound *> mapSound;  
     
-    FMOD::System* pSystem;*/
-    
+    FMOD::System* pSystem;
+#endif
 };
 }
 NS_CC_END
 #endif // __AUDIO_ENGINE_LINUX_H_
 #endif
-
