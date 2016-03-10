@@ -85,12 +85,59 @@ THE SOFTWARE.
 #define glDisableVertexAttribArray(...)
 #define GL_FRAMEBUFFER_BINDING 0
 #define GL_DEPTH24_STENCIL8 0
+#define CC_GL_DEPTH24_STENCIL8      GL_DEPTH24_STENCIL8
 
-#else
+#elif !defined(LINUX_ARM)
+
 #include "GL/glew.h"
-#endif
 
 #define CC_GL_DEPTH24_STENCIL8      GL_DEPTH24_STENCIL8
+
+
+#else
+
+#define glClearDepth                glClearDepthf
+#define glDeleteVertexArrays        glDeleteVertexArraysOES
+#define glGenVertexArrays           glGenVertexArraysOES
+#define glBindVertexArray           glBindVertexArrayOES
+#define glMapBuffer                 glMapBufferOES
+#define glUnmapBuffer               glUnmapBufferOES
+
+#define GL_DEPTH24_STENCIL8         GL_DEPTH24_STENCIL8_OES
+#define GL_WRITE_ONLY               GL_WRITE_ONLY_OES
+
+#include <GLES2/gl2platform.h>
+#ifndef GL_GLEXT_PROTOTYPES
+#define GL_GLEXT_PROTOTYPES 1
+#endif
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+
+#ifndef GL_BGRA
+#define GL_BGRA  0x80E1
+#endif
+
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+#include <EGL/eglplatform.h>
+
+#undef None
+#undef Bool
+
+//declare here while define in EGLView_android.cpp
+extern PFNGLGENVERTEXARRAYSOESPROC glGenVertexArraysOESEXT;
+extern PFNGLBINDVERTEXARRAYOESPROC glBindVertexArrayOESEXT;
+extern PFNGLDELETEVERTEXARRAYSOESPROC glDeleteVertexArraysOESEXT;
+
+#define glGenVertexArraysOES glGenVertexArraysOESEXT
+#define glBindVertexArrayOES glBindVertexArrayOESEXT
+#define glDeleteVertexArraysOES glDeleteVertexArraysOESEXT
+
+#if !defined(GL_VERTEX_PROGRAM_POINT_SIZE)
+#define GL_VERTEX_PROGRAM_POINT_SIZE 0x8642
+#endif
+
+#endif
 
 #endif // CC_TARGET_PLATFORM == CC_PLATFORM_LINUX
 

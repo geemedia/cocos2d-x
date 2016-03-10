@@ -330,7 +330,7 @@ All features from Layer are valid, plus the following new features:
 - opacity
 - RGB colors
 */
-class CC_DLL LayerColor : public Layer, public BlendProtocol
+class CC_DLL LayerColor : public BlendProtocol, public Layer
 {
 public:
     /** Creates a fullscreen black layer.
