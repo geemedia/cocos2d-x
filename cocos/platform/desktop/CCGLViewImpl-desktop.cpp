@@ -889,7 +889,7 @@ static bool glew_dynamic_binding()
 // helper
 bool GLViewImpl::initGlew()
 {
-#if (CC_TARGET_PLATFORM != CC_PLATFORM_MAC)
+#if (CC_TARGET_PLATFORM != CC_PLATFORM_MAC) && !CC_OPENGL1_ONLY
     GLenum GlewInitResult = glewInit();
     if (GLEW_OK != GlewInitResult)
     {
