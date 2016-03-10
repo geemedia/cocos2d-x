@@ -207,7 +207,9 @@ if(LINUX OR MACOSX OR WINDOWS)
 
     cocos_find_package(FMOD FMOD REQUIRED)
     cocos_find_package(Fontconfig FONTCONFIG REQUIRED)
-    if(NOT OPENGL1_ONLY) #TODO: FDP-5141 use correct feature flag
+    if(DISABLE_GTK3)
+      add_definitions(-DCC_DISABLE_GTK3=1)
+    else()
       cocos_find_package(GTK3 GTK3 REQUIRED)
     endif()
   endif()

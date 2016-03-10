@@ -25,14 +25,17 @@
 
 #include "UIEditBoxImpl-linux.h"
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX) && !CC_OPENGL1_ONLY //TODO: FDP-5141 use correct feature flag
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
 
 #include "UIEditBox.h"
 #include "2d/CCLabel.h"
 #include "base/ccUTF8.h"
+
+#if !CC_DISABLE_GTK3
+
 #include <gtk/gtk.h>
 
-// desoty dialog when lost focus
+// destroy dialog when lost focus
 static void dialogFocusOutCallback(GtkWidget* widget, gpointer user_data)
 {
     gtk_widget_destroy(widget);
@@ -77,12 +80,17 @@ bool LinuxInputBox(std::string &entryLine)
     return didChange;
 }
 
+#endif /* #if !CC_DISABLE_GTK3 */
+
 NS_CC_BEGIN
 
 namespace ui {
 
 EditBoxImpl* __createSystemEditBox(EditBox* pEditBox)
 {
+#if CC_DISABLE_GTK3
+    CCLOGERROR("UIEditBox is not supported on this platform!");
+#endif
     return new EditBoxImplLinux(pEditBox);
 }
 
@@ -104,12 +112,16 @@ bool EditBoxImplLinux::isEditing()
 
 void EditBoxImplLinux::nativeOpenKeyboard()
 {
+#if !CC_DISABLE_GTK3
     std::string text = this->getText();
     bool didChange = LinuxInputBox(text);
     if (didChange)
     {
         this->editBoxEditingDidEnd(text);
     }
+#else
+    CCLOGERROR("UIEditBox::nativeOpenKeyboard is not implemented on this platform!");
+#endif
 }
 
 }
