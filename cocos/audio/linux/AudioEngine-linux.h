@@ -31,8 +31,10 @@
 #include <functional>
 #include <iostream>
 #include <map>
-//#include "fmod.hpp"
-//#include "fmod_errors.h"
+#ifndef LINUX_ARM
+#include "fmod.hpp"
+#include "fmod_errors.h"
+#endif
 #include "AudioEngine.h"
 
 #include "base/CCRef.h"

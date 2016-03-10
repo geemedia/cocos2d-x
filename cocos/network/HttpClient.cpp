@@ -38,6 +38,7 @@ namespace network {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
 typedef int int32_t;
 #endif
+
 #ifndef CURLOPT_ACCEPT_ENCODING
 #define CURLOPT_ACCEPT_ENCODING CURLOPT_ENCODING
 #endif

@@ -150,6 +150,7 @@ RenderTargetRenderBuffer::RenderTargetRenderBuffer()
 
 RenderTargetRenderBuffer::~RenderTargetRenderBuffer()
 {
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     if(glIsRenderbuffer(_colorBuffer))
     {
         glDeleteRenderbuffers(1, &_colorBuffer);
@@ -158,10 +159,14 @@ RenderTargetRenderBuffer::~RenderTargetRenderBuffer()
 #if CC_ENABLE_CACHE_TEXTURE_DATA
     Director::getInstance()->getEventDispatcher()->removeEventListener(_reBuildRenderBufferListener);
 #endif
+#endif
 }
 
 bool RenderTargetRenderBuffer::init(unsigned int width, unsigned int height)
 {
+#if CC_DISABLE_GL_FRAMEBUFFER_OBJECT
+    return false;
+#else
     if(!RenderTargetBase::init(width, height)) return false;
     GLint oldRenderBuffer(0);
     glGetIntegerv(GL_RENDERBUFFER_BINDING, &oldRenderBuffer);
@@ -191,6 +196,7 @@ bool RenderTargetRenderBuffer::init(unsigned int width, unsigned int height)
 #endif
     
     return true;
+#endif
 }
 
 
@@ -221,6 +227,7 @@ RenderTargetDepthStencil::RenderTargetDepthStencil()
 
 RenderTargetDepthStencil::~RenderTargetDepthStencil()
 {
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     if(glIsRenderbuffer(_depthStencilBuffer))
     {
         glDeleteRenderbuffers(1, &_depthStencilBuffer);
@@ -229,10 +236,14 @@ RenderTargetDepthStencil::~RenderTargetDepthStencil()
 #if CC_ENABLE_CACHE_TEXTURE_DATA
     Director::getInstance()->getEventDispatcher()->removeEventListener(_reBuildDepthStencilListener);
 #endif
+#endif
 }
 
 bool RenderTargetDepthStencil::init(unsigned int width, unsigned int height)
 {
+#if CC_DISABLE_GL_FRAMEBUFFER_OBJECT
+    return false;
+#else
     if(!RenderTargetBase::init(width, height)) return false;
     GLint oldRenderBuffer(0);
     glGetIntegerv(GL_RENDERBUFFER_BINDING, &oldRenderBuffer);
@@ -261,6 +272,7 @@ bool RenderTargetDepthStencil::init(unsigned int width, unsigned int height)
 #endif
     
     return true;
+#endif
 }
 
 
@@ -347,6 +359,13 @@ FrameBuffer* FrameBuffer::create(uint8_t fid, unsigned int width, unsigned int h
 
 bool FrameBuffer::init(uint8_t fid, unsigned int width, unsigned int height)
 {
+#if CC_DISABLE_GL_FRAMEBUFFER_OBJECT
+    CC_UNUSED_PARAM(fid);
+    CC_UNUSED_PARAM(width);
+    CC_UNUSED_PARAM(height);
+
+    return false;
+#else
     _fid = fid;
     _width = width;
     _height = height;
@@ -377,6 +396,7 @@ bool FrameBuffer::init(uint8_t fid, unsigned int width, unsigned int height)
     Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(_dirtyFBOListener, -1);
 #endif
     return true;
+#endif
 }
 
 FrameBuffer::FrameBuffer()
@@ -400,7 +420,11 @@ FrameBuffer::~FrameBuffer()
     {
         CC_SAFE_RELEASE_NULL(_rt);
         CC_SAFE_RELEASE_NULL(_rtDepthStencil);
+
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
         glDeleteFramebuffers(1, &_fbo);
+#endif
+
         _fbo = 0;
         _frameBuffers.erase(this);
 #if CC_ENABLE_CACHE_TEXTURE_DATA
@@ -442,6 +466,7 @@ void FrameBuffer::attachRenderTarget(RenderTargetBase* rt)
 
 void FrameBuffer::applyFBO()
 {
+#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     CHECK_GL_ERROR_DEBUG();
     glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
     CHECK_GL_ERROR_DEBUG();
@@ -465,6 +490,7 @@ void FrameBuffer::applyFBO()
         CCLOG("FrameBuffer Status Error %d", (int)glCheckFramebufferStatus(GL_FRAMEBUFFER));
     }
     CHECK_GL_ERROR_DEBUG();
+#endif
 }
 
 void FrameBuffer::attachDepthStencilTarget(RenderTargetDepthStencil* rt)

@@ -28,11 +28,71 @@ THE SOFTWARE.
 #include "platform/CCPlatformConfig.h"
 #if CC_TARGET_PLATFORM == CC_PLATFORM_LINUX
 
-#ifndef LINUX_ARM
+#if CC_OPENGL1_ONLY
+#include "GL/gl.h"
+
+#define glBindBuffer(...)
+#define glGenBuffers(...)
+#define glDeleteBuffers(...)
+#define glGenVertexArrays(...)
+#define glDeleteVertexArrays(...)
+#define glBufferData(...)
+#define glVertexAttribPointer(...)
+#define glGetUniformLocation(...) 0
+#define glCreateProgram(...) 0
+#define glAttachShader(...)
+#define glBindAttribLocation(...)
+#define glGetProgramiv(...) 0
+#define glEnableVertexAttribArray(...)
+#define glBufferSubData(...)
+#define glUniform1i(...)
+#define glUniform2i(...)
+#define glUniform3i(...)
+#define glUniform4i(...)
+#define glUniform2iv(...)
+#define glUniform3iv(...)
+#define glUniform4iv(...)
+#define glUniform1f(...)
+#define glUniform2f(...)
+#define glUniform3f(...)
+#define glUniform4f(...)
+#define glUniform1fv(...)
+#define glUniform2fv(...)
+#define glUniform3fv(...)
+#define glUniform4fv(...)
+#define glUniformMatrix2fv(...)
+#define glUniformMatrix3fv(...)
+#define glUniformMatrix4fv(...)
+#define glGetAttribLocation(...) 0
+#define glGetActiveAttrib(...) 0
+#define glGetProgramInfoLog(...) 0
+#define glGetActiveUniform(...) 0
+#define glCreateShader(...) 0
+#define glShaderSource(...)
+#define glCompileShader(...)
+#define glGetShaderiv(...) 0
+#define glGetShaderSource(...) 0
+#define glLinkProgram(...)
+#define glGetShaderiv(...) 0
+#define glGetShaderInfoLog(...) 0
+#define glDeleteShader(...)
+#define glMapBuffer(...) 0
+#define glUnmapBuffer(...)
+#define glIsBuffer(...) 0
+#define glDeleteProgram(...)
+#define glUseProgram(...)
+#define glBindVertexArray(...)
+#define glDisableVertexAttribArray(...)
+#define GL_FRAMEBUFFER_BINDING 0
+#define GL_DEPTH24_STENCIL8 0
+#define CC_GL_DEPTH24_STENCIL8      GL_DEPTH24_STENCIL8
+
+#elif !defined(LINUX_ARM)
 
 #include "GL/glew.h"
 
 #define CC_GL_DEPTH24_STENCIL8      GL_DEPTH24_STENCIL8
+
 
 #else
 

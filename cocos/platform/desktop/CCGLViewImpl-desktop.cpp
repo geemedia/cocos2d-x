@@ -818,6 +818,28 @@ void GLViewImpl::onGLFWWindowIconifyCallback(GLFWwindow* window, int iconified)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
 static bool glew_dynamic_binding()
 {
+#if CC_DISABLE_GL_FRAMEBUFFER_OBJECT
+    log("OpenGL: Forcing no framebuffers extension support");
+    log("OpenGL: Any call to Fbo will crash!");
+
+    glIsRenderbuffer = nullptr;
+    glBindRenderbuffer = nullptr;
+    glDeleteRenderbuffers = nullptr;
+    glGenRenderbuffers = nullptr;
+    glRenderbufferStorage = nullptr;
+    glGetRenderbufferParameteriv = nullptr;
+    glIsFramebuffer = nullptr;
+    glBindFramebuffer = nullptr;
+    glDeleteFramebuffers = nullptr;
+    glGenFramebuffers = nullptr;
+    glCheckFramebufferStatus = nullptr;
+    glFramebufferTexture1D = nullptr;
+    glFramebufferTexture2D = nullptr;
+    glFramebufferTexture3D = nullptr;
+    glFramebufferRenderbuffer = nullptr;
+    glGetFramebufferAttachmentParameteriv = nullptr;
+    glGenerateMipmap = nullptr;
+#else
     const char *gl_extensions = (const char*)glGetString(GL_EXTENSIONS);
 
     // If the current opengl driver doesn't have framebuffers methods, check if an extension exists
@@ -875,6 +897,7 @@ static bool glew_dynamic_binding()
             return false;
         }
     }
+#endif
     return true;
 }
 #endif
@@ -886,7 +909,7 @@ bool GLViewImpl::initGlew()
     glGenVertexArraysOESEXT = (PFNGLGENVERTEXARRAYSOESPROC)eglGetProcAddress("glGenVertexArraysOES");
     glBindVertexArrayOESEXT = (PFNGLBINDVERTEXARRAYOESPROC)eglGetProcAddress("glBindVertexArrayOES");
     glDeleteVertexArraysOESEXT = (PFNGLDELETEVERTEXARRAYSOESPROC)eglGetProcAddress("glDeleteVertexArraysOES");
-#elif (CC_TARGET_PLATFORM != CC_PLATFORM_MAC)
+#elif (CC_TARGET_PLATFORM != CC_PLATFORM_MAC) && !CC_OPENGL1_ONLY
     GLenum GlewInitResult = glewInit();
     if (GLEW_OK != GlewInitResult)
     {
