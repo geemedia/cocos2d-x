@@ -31,8 +31,10 @@
 #include <functional>
 #include <iostream>
 #include <map>
+#ifndef LINUX_ARM
 #include "fmod.hpp"
 #include "fmod_errors.h"
+#endif
 #include "AudioEngine.h"
 
 #include "base/CCRef.h"
@@ -71,10 +73,13 @@ public:
     /**
      * used internally by ffmod callback 
      */ 
+#ifndef LINUX_ARM
     void onSoundFinished(FMOD::Channel * channel); 
-    
+#endif
+
 private:
-  
+
+#ifndef LINUX_ARM
     /**
     * returns null if a sound with the given path is not found
     */
@@ -97,10 +102,9 @@ private:
     std::map<std::string, FMOD::Sound *> mapSound;  
     
     FMOD::System* pSystem;
-    
+#endif
 };
 }
 NS_CC_END
 #endif // __AUDIO_ENGINE_LINUX_H_
 #endif
-

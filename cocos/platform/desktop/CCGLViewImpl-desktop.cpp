@@ -39,6 +39,13 @@ THE SOFTWARE.
 #include "2d/CCCamera.h"
 #include "deprecated/CCString.h"
 
+#ifdef GL_ES_VERSION_2_0
+#include <EGL/egl.h>
+PFNGLGENVERTEXARRAYSOESPROC glGenVertexArraysOESEXT = 0;
+PFNGLBINDVERTEXARRAYOESPROC glBindVertexArrayOESEXT = 0;
+PFNGLDELETEVERTEXARRAYSOESPROC glDeleteVertexArraysOESEXT = 0;
+#endif
+
 NS_CC_BEGIN
 
 // GLFWEventHandler
@@ -355,6 +362,11 @@ bool GLViewImpl::initWithRect(const std::string& viewName, Rect rect, float fram
     glfwWindowHint(GLFW_ALPHA_BITS,_glContextAttrs.alphaBits);
     glfwWindowHint(GLFW_DEPTH_BITS,_glContextAttrs.depthBits);
     glfwWindowHint(GLFW_STENCIL_BITS,_glContextAttrs.stencilBits);
+    
+#ifdef GL_ES_VERSION_2_0
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+#endif
 
     int needWidth = rect.size.width * _frameZoomFactor;
     int neeHeight = rect.size.height * _frameZoomFactor;
@@ -412,6 +424,7 @@ bool GLViewImpl::initWithRect(const std::string& viewName, Rect rect, float fram
     // check OpenGL version at first
     const GLubyte* glVersion = glGetString(GL_VERSION);
 
+#ifndef GL_ES_VERSION_2_0
     if ( utils::atof((const char*)glVersion) < 1.5 )
     {
         char strComplain[256] = {0};
@@ -421,11 +434,14 @@ bool GLViewImpl::initWithRect(const std::string& viewName, Rect rect, float fram
         MessageBox(strComplain, "OpenGL version too old");
         return false;
     }
+#endif
 
     initGlew();
 
+#ifndef GL_ES_VERSION_2_0
     // Enable point size by default.
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+#endif
 
     return true;
 }
@@ -889,7 +905,11 @@ static bool glew_dynamic_binding()
 // helper
 bool GLViewImpl::initGlew()
 {
-#if (CC_TARGET_PLATFORM != CC_PLATFORM_MAC) && !CC_OPENGL1_ONLY
+#ifdef GL_ES_VERSION_2_0
+    glGenVertexArraysOESEXT = (PFNGLGENVERTEXARRAYSOESPROC)eglGetProcAddress("glGenVertexArraysOES");
+    glBindVertexArrayOESEXT = (PFNGLBINDVERTEXARRAYOESPROC)eglGetProcAddress("glBindVertexArrayOES");
+    glDeleteVertexArraysOESEXT = (PFNGLDELETEVERTEXARRAYSOESPROC)eglGetProcAddress("glDeleteVertexArraysOES");
+#elif (CC_TARGET_PLATFORM != CC_PLATFORM_MAC) && !CC_OPENGL1_ONLY
     GLenum GlewInitResult = glewInit();
     if (GLEW_OK != GlewInitResult)
     {
