@@ -39,6 +39,10 @@ namespace network {
 typedef int int32_t;
 #endif
 
+#ifndef CURLOPT_ACCEPT_ENCODING
+#define CURLOPT_ACCEPT_ENCODING CURLOPT_ENCODING
+#endif
+
 static HttpClient* _httpClient = nullptr; // pointer to singleton
 
 typedef size_t (*write_callback)(void *ptr, size_t size, size_t nmemb, void *stream);
