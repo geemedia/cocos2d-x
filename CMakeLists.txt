@@ -186,8 +186,8 @@ endif()
 # desktop platforms
 if(LINUX OR MACOSX OR WINDOWS)
   if(LINUX_ARM)
-    cocos_find_package(GLES GLES REQUIRED)
-    add_definitions(-DGLFW_INCLUDE_ES2=1)
+    cocos_find_package(GLES2 GLES2 REQUIRED)
+    add_definitions(-DLINUX_ARM=1 -DGLFW_INCLUDE_ES2=1)
   else()
     cocos_find_package(OpenGL OPENGL REQUIRED)
 
