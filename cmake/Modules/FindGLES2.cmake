@@ -7,7 +7,7 @@
 # GLES_LIBRARY
 #
 
-find_path(GLES_INCLUDE_DIR GLES/gl.h)
+find_path(GLES_INCLUDE_DIR GLES2/gl2.h)
 find_library(GLES_LIBRARY NAMES GLESv2)
 
 include(FindPackageHandleStandardArgs)

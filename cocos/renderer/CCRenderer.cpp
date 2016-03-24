@@ -780,6 +780,9 @@ void Renderer::drawBatchedTriangles()
         // option 2: data
 //        glBufferData(GL_ARRAY_BUFFER, sizeof(_verts[0]) * _filledVertex, _verts, GL_STATIC_DRAW);
 
+#ifdef CC_DISABLE_GL_MAP_BUFFER
+        glBufferData(GL_ARRAY_BUFFER, sizeof(_verts[0]) * _filledVertex, &_verts[0], GL_STATIC_DRAW);
+#else
         // option 3: orphaning + glMapBuffer
         // FIXME: in order to work as fast as possible, it must "and the exact same size and usage hints it had before."
         //  source: https://www.opengl.org/wiki/Buffer_Object_Streaming#Explicit_multiple_buffering
@@ -788,6 +791,7 @@ void Renderer::drawBatchedTriangles()
         void *buf = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         memcpy(buf, _verts, sizeof(_verts[0]) * _filledVertex);
         glUnmapBuffer(GL_ARRAY_BUFFER);
+#endif
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         
