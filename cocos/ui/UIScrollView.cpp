@@ -492,7 +492,12 @@ bool ScrollView::isNecessaryAutoScrollBrake()
     }
     return false;
 }
-    
+
+float ScrollView::getAutoScrollStopEpsilon()
+{
+    return FLT_EPSILON;
+}
+
 void ScrollView::processAutoScrolling(float deltaTime)
 {
     // Make auto scroll shorter if it needs to deaccelerate.
@@ -511,8 +516,13 @@ void ScrollView::processAutoScrolling(float deltaTime)
     
     // Calculate the new position
     Vec2 newPosition = _autoScrollStartPosition + (_autoScrollTargetDelta * percentage);
-    bool reachedEnd = (percentage == 1);
+    bool reachedEnd = fabs(percentage - 1) <= this->getAutoScrollStopEpsilon();
     
+    if (reachedEnd)
+    {
+        newPosition = _autoScrollStartPosition + _autoScrollTargetDelta;
+    }
+
     if(_bounceEnabled)
     {
         // The new position is adjusted if out of boundary
