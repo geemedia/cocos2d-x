@@ -32,6 +32,11 @@ THE SOFTWARE.
 // 00   03 08 00
 #define COCOS2D_VERSION 0x00031000
 
+// Shifted to append the GEE version at the end, for better comparison if needed.
+// e.g. 0x03100004 equals to 3.10.00-gee-4
+#define COCOS2D_VERSION_GEE ((COCOS2D_VERSION << 8) | 0x04)
+#define COCOS2D_VERSION_SUFFIX ""
+
 //
 // all cocos2d include files
 //
