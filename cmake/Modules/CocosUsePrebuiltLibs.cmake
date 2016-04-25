@@ -85,7 +85,7 @@ if(MSVC)
   list(APPEND all_prebuilt_libs glfw3 sqlite3 gles icon MP3Decoder OggDecoder OpenalSoft zlib)
 endif()
 
-if(LINUX)
+if(LINUX OR ANDROID)
   list(APPEND all_prebuilt_libs fmod)
 endif()
 

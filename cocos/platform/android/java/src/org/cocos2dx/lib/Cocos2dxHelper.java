@@ -63,6 +63,7 @@ public class Cocos2dxHelper {
 
     private static Cocos2dxMusic sCocos2dMusic;
     private static Cocos2dxSound sCocos2dSound;
+    private static Cocos2dxFmod sCocos2dFmod;
     private static AssetManager sAssetManager;
     private static Cocos2dxAccelerometer sCocos2dxAccelerometer;
     private static boolean sAccelerometerEnabled;
@@ -106,6 +107,7 @@ public class Cocos2dxHelper {
             Cocos2dxHelper.sCocos2dxAccelerometer = new Cocos2dxAccelerometer(activity);
             Cocos2dxHelper.sCocos2dMusic = new Cocos2dxMusic(activity);
             Cocos2dxHelper.sCocos2dSound = new Cocos2dxSound(activity);
+            Cocos2dxHelper.sCocos2dFmod = new Cocos2dxFmod(activity);
             Cocos2dxHelper.sAssetManager = activity.getAssets();
             Cocos2dxHelper.nativeSetContext((Context)activity, Cocos2dxHelper.sAssetManager);
     
@@ -330,6 +332,14 @@ public class Cocos2dxHelper {
         if (Cocos2dxHelper.sAccelerometerEnabled) {
             Cocos2dxHelper.sCocos2dxAccelerometer.disable();
         }
+    }
+
+    public static void onStart() {
+        Cocos2dxHelper.sCocos2dFmod.start();
+    }
+
+    public static void onStop() {
+        Cocos2dxHelper.sCocos2dFmod.stop();
     }
 
     public static void onEnterBackground() {

@@ -315,14 +315,26 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     
     private void resumeIfHasFocus() {
         if(hasFocus) {
-        	Cocos2dxHelper.onResume();
-        	mGLSurfaceView.onResume();
+            Cocos2dxHelper.onResume();
+            mGLSurfaceView.onResume();
         }
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        Cocos2dxHelper.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        Cocos2dxHelper.onStop();
+        super.onStop();
+    }
+
+    @Override
     protected void onPause() {
-    	Log.d(TAG, "onPause()");
+        Log.d(TAG, "onPause()");
         super.onPause();
         Cocos2dxHelper.onPause();
         mGLSurfaceView.onPause();

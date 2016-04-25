@@ -230,6 +230,10 @@ if(LINUX OR MACOSX OR WINDOWS)
   endif()
 endif(LINUX OR MACOSX OR WINDOWS)
 
+if(ANDROID)
+  cocos_find_package(FMOD FMOD REQUIRED)
+endif()
+
 # Freetype required on all platforms
 cocos_find_package(Freetype FREETYPE REQUIRED)
 

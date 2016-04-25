@@ -129,6 +129,7 @@ elseif(MACOSX OR APPLE)
 
 elseif(ANDROID)
   set(PLATFORM_SPECIFIC_LIBS GLESv2 log android)
+  cocos_use_pkg(cocos2d FMOD)
 else()
   message( FATAL_ERROR "Unsupported platform, CMake will exit" )
 endif()

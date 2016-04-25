@@ -48,7 +48,7 @@ elseif(ANDROID)
         audio/android/cddSimpleAudioEngine.cpp
         audio/android/ccdandroidUtils.cpp
         audio/android/jni/cddandroidAndroidJavaEngine.cpp
-        audio/android/AudioEngine-inl.cpp
+        audio/android/AudioEngine-fmod.cpp
     )
 
 endif()
