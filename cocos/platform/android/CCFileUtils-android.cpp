@@ -60,7 +60,7 @@ FileUtils* FileUtils::getInstance()
     if (s_sharedFileUtils == nullptr)
     {
         s_sharedFileUtils = new FileUtilsAndroid();
-        if(!s_sharedFileUtils->init())
+        if (!s_sharedFileUtils->init())
         {
           delete s_sharedFileUtils;
           s_sharedFileUtils = nullptr;
@@ -95,7 +95,7 @@ bool FileUtilsAndroid::init()
         _defaultResRootPath = "assets/";
         
         std::string assetsPath(getApkPath());
-        if(assetsPath.find("/obb/") != std::string::npos)
+        if (assetsPath.find("/obb/") != std::string::npos)
         {
             obbfile = new ZipFile(assetsPath);
         }
@@ -178,7 +178,7 @@ bool FileUtilsAndroid::isFileExistInternal(const std::string& strFilePath) const
         // Found "assets/" at the beginning of the path and we don't want it
         if (strFilePath.find(_defaultResRootPath) == 0) s += _defaultResRootPath.length();
         
-        if(obbfile && obbfile->fileExists(s))
+        if (obbfile && obbfile->fileExists(s))
         {
             bFound = true;
         }
@@ -197,7 +197,7 @@ bool FileUtilsAndroid::isFileExistInternal(const std::string& strFilePath) const
     else
     {
         FILE *fp = fopen(strFilePath.c_str(), "r");
-        if(fp)
+        if (fp)
         {
             bFound = true;
             fclose(fp);

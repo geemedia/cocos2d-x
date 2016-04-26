@@ -155,7 +155,7 @@ public class Cocos2dxHelper {
     // else it returns the absolute path to the APK.
     public static String getAssetsPath()
     {
-        if(Cocos2dxHelper.sAssetsPath == "") {
+        if (Cocos2dxHelper.sAssetsPath == "") {
             int versionCode = 1;
             try {
                 versionCode = Cocos2dxHelper.sActivity.getPackageManager().getPackageInfo(Cocos2dxHelper.sPackageName, 0).versionCode;
@@ -164,7 +164,7 @@ public class Cocos2dxHelper {
             }
             String pathToOBB = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/obb/" + Cocos2dxHelper.sPackageName + "/main." + versionCode + "." + Cocos2dxHelper.sPackageName + ".obb";
             File obbFile = new File(pathToOBB);
-            if(obbFile.exists())
+            if (obbFile.exists())
                 Cocos2dxHelper.sAssetsPath = pathToOBB;
             else
                 Cocos2dxHelper.sAssetsPath = Cocos2dxHelper.sActivity.getApplicationInfo().sourceDir;
