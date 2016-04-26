@@ -114,6 +114,7 @@ foreach(_lib ${all_prebuilt_libs})
         ${_root}/include/${ARCH_DIR}
         ${_root}/include/${PLATFORM_FOLDER}
         ${_root}/include/${PLATFORM_FOLDER}/${ARCH_DIR}
+        ${_root}/include/${PLATFORM_FOLDER}/${ANDROID_ABI}
         )
       set(include_dirs)
       foreach(_dir ${include_dir_candidates})
@@ -139,6 +140,7 @@ foreach(_lib ${all_prebuilt_libs})
       #message(STATUS "${_lib} ${_prefix}_INCLUDE_DIRS: ${${_prefix}_INCLUDE_DIRS}")
 
       set(lib_dir_candidates
+        ${_root}/prebuilt/${PLATFORM_FOLDER}/${ANDROID_ABI}
         ${_root}/prebuilt/${PLATFORM_FOLDER}/${ARCH_DIR}
         ${_root}/prebuilt/${PLATFORM_FOLDER}
         ${_root}/prebuilt/${PLATFORM_FOLDER}/release-lib

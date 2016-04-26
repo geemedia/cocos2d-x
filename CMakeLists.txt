@@ -126,6 +126,11 @@ endif(MSVC)
 
 set(COCOS_EXTERNAL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external)
 
+if (CMAKE_FIND_ROOT_PATH)
+  # Adds cocos2d-x external folder to the list of valid include/library paths when cross-compiling
+  set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${COCOS_EXTERNAL_DIR})
+endif ()
+
 # Some macro definitions
 if(WINDOWS)
 
