@@ -80,6 +80,10 @@ if(MACOSX)
   list(APPEND all_prebuilt_libs glfw3 zlib)
 endif()
 
+if(ANDROID)
+  list(APPEND all_prebuilt_libs zlib)
+endif()
+
 # We use MSVC instead of WINDOWS because it can be mingw that can't use our prebuilt libs
 if(MSVC)
   list(APPEND all_prebuilt_libs glfw3 sqlite3 gles icon MP3Decoder OggDecoder OpenalSoft zlib)
