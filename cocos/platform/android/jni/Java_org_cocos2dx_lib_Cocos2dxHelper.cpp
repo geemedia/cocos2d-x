@@ -232,6 +232,24 @@ extern bool openURLJNI(const char* url) {
     return ret;
 }
 
+void startFmodJNI() {
+    JniMethodInfo t;
+
+    if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "startFmod", "()V")) {
+        t.env->CallStaticVoidMethod(t.classID, t.methodID);
+        t.env->DeleteLocalRef(t.classID);
+    }
+}
+
+void stopFmodJNI() {
+    JniMethodInfo t;
+
+    if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "stopFmod", "()V")) {
+        t.env->CallStaticVoidMethod(t.classID, t.methodID);
+        t.env->DeleteLocalRef(t.classID);
+    }
+}
+
 // functions for UserDefault
 bool getBoolForKeyJNI(const char* key, bool defaultValue)
 {

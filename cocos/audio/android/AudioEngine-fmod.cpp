@@ -19,6 +19,7 @@
 #include "base/CCScheduler.h"
 #include "platform/android/CCFileUtils-android.h"
 #include "platform/android/jni/CocosPlayClient.h"
+#include "platform/android/jni/Java_org_cocos2dx_lib_Cocos2dxHelper.h"
 
 using namespace cocos2d;
 using namespace cocos2d::experimental;
@@ -54,8 +55,8 @@ FMOD_RESULT F_CALLBACK channelCallback(FMOD_CHANNEL* channel,
 
 AudioEngineImpl::AudioEngineImpl()
 : _fmodSystem(nullptr),
-  _bufferLength(512),
-  _numBuffers(2),
+  _bufferLength(1024),
+  _numBuffers(4),
   _lazyInitLoop(true)
 {
 }
@@ -64,12 +65,15 @@ AudioEngineImpl::~AudioEngineImpl()
 {
     ERRCHECKWITHEXIT(_fmodSystem->close());
     ERRCHECKWITHEXIT(_fmodSystem->release());
+
+	stopFmodJNI();
 }
 
 bool AudioEngineImpl::init()
 {
+	startFmodJNI();
+
     ERRCHECKWITHEXIT(FMOD::System_Create(&_fmodSystem));
-    ERRCHECKWITHEXIT(_fmodSystem->setOutput(FMOD_OUTPUTTYPE_AUDIOTRACK));
     ERRCHECK(_fmodSystem->setDSPBufferSize(_bufferLength, _numBuffers));
     ERRCHECK(_fmodSystem->init(MAX_AUDIOINSTANCES, FMOD_INIT_NORMAL, 0));
 
