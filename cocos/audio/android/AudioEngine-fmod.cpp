@@ -1,4 +1,4 @@
-#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) && CC_USE_ANDROID_FMOD
 #include <cstring>
 #include "cocos2d.h"
 #include "fmod_errors.h"

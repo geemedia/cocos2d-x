@@ -1,6 +1,6 @@
 #include "platform/CCPlatformConfig.h"
 
-#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) && CC_USE_ANDROID_FMOD
 
 #ifndef __AUDIO_ENGINE_ANDROID_H_
 #define __AUDIO_ENGINE_ANDROID_H_
@@ -15,7 +15,7 @@
 #define MAX_AUDIOINSTANCES 24
 
 NS_CC_BEGIN
-    namespace experimental{
+namespace experimental{
 class AudioEngineImpl;
 
 class CC_DLL AudioEngineImpl : public cocos2d::Ref
@@ -25,8 +25,8 @@ public:
     ~AudioEngineImpl();
     
     bool init();
-    int play2d(const std::string &fileFullPath ,bool loop ,float volume);
-    void setVolume(int audioID,float volume);
+    int play2d(const std::string &fileFullPath, bool loop, float volume);
+    void setVolume(int audioID, float volume);
     void setLoop(int audioID, bool loop);
     bool pause(int audioID);
     bool resume(int audioID);

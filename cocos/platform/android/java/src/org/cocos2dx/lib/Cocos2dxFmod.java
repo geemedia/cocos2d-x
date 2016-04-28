@@ -29,10 +29,6 @@ public class Cocos2dxFmod {
 
     public Cocos2dxFmod(final Context context) {
         this.mContext = context;
-        this.initData();
-    }
-
-    private void initData() {
         mFmodAudioDevice = new FMODAudioDevice();
     }
 

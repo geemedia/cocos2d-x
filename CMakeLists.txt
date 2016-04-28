@@ -233,6 +233,7 @@ endif(LINUX OR MACOSX OR WINDOWS)
 
 if(ANDROID AND USE_ANDROID_FMOD)
   cocos_find_package(FMOD FMOD REQUIRED)
+  add_definitions(-DCC_USE_ANDROID_FMOD=1)
 endif()
 
 # Freetype required on all platforms
