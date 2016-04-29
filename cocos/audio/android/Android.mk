@@ -8,9 +8,9 @@ LOCAL_MODULE := audioengine_static
 LOCAL_MODULE_FILENAME := libaudioengine
 
 ifeq ($(USE_ANDROID_FMOD),1)
-LOCAL_SRC_FILES := AudioEngine-fmod.cpp \
+LOCAL_SRC_FILES := AudioEngine-fmod.cpp
 else
-LOCAL_SRC_FILES := AudioEngine-inl.cpp \
+LOCAL_SRC_FILES := AudioEngine-inl.cpp
 endif
 LOCAL_SRC_FILES += ../AudioEngine.cpp
 
