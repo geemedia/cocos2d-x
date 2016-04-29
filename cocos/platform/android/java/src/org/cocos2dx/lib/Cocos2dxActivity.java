@@ -299,14 +299,14 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 
     @Override
     protected void onResume() {
-    	Log.d(TAG, "onResume()");
+        Log.d(TAG, "onResume()");
         super.onResume();
-       	resumeIfHasFocus();
+        resumeIfHasFocus();
     }
     
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-    	Log.d(TAG, "onWindowFocusChanged() hasFocus=" + hasFocus);
+        Log.d(TAG, "onWindowFocusChanged() hasFocus=" + hasFocus);
         super.onWindowFocusChanged(hasFocus);
         
         this.hasFocus = hasFocus;
@@ -315,14 +315,14 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     
     private void resumeIfHasFocus() {
         if(hasFocus) {
-        	Cocos2dxHelper.onResume();
-        	mGLSurfaceView.onResume();
+            Cocos2dxHelper.onResume();
+            mGLSurfaceView.onResume();
         }
     }
 
     @Override
     protected void onPause() {
-    	Log.d(TAG, "onPause()");
+        Log.d(TAG, "onPause()");
         super.onPause();
         Cocos2dxHelper.onPause();
         mGLSurfaceView.onPause();

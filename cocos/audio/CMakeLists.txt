@@ -48,9 +48,12 @@ elseif(ANDROID)
         audio/android/cddSimpleAudioEngine.cpp
         audio/android/ccdandroidUtils.cpp
         audio/android/jni/cddandroidAndroidJavaEngine.cpp
-        audio/android/AudioEngine-inl.cpp
     )
-
+    if(USE_ANDROID_FMOD)
+        list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/android/AudioEngine-fmod.cpp)
+    else()
+        list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/android/AudioEngine-inl.cpp)
+    endif()
 endif()
 
 list(APPEND COCOS_AUDIO_SRC ${COCOS_AUDIO_PLATFORM_SRC})

@@ -43,6 +43,8 @@ extern void vibrateJni(float duration);
 extern std::string getVersionJNI();
 extern bool openURLJNI(const char* url);
 extern int getObbAssetFileDescriptorJNI(const char* path, long* startOffset, long* size);
+extern void startFmodJNI();
+extern void stopFmodJNI();
 // functions for UserDefault
 extern bool getBoolForKeyJNI(const char* key, bool defaultValue);
 extern int getIntegerForKeyJNI(const char* key, int defaultValue);

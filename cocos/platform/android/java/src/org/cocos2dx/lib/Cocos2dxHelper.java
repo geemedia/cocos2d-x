@@ -73,6 +73,7 @@ public class Cocos2dxHelper {
 
     private static Cocos2dxMusic sCocos2dMusic;
     private static Cocos2dxSound sCocos2dSound;
+    private static Cocos2dxFmod sCocos2dFmod = null;
     private static AssetManager sAssetManager;
     private static Cocos2dxAccelerometer sCocos2dxAccelerometer;
     private static boolean sAccelerometerEnabled;
@@ -267,14 +268,14 @@ public class Cocos2dxHelper {
         sVibrateService.vibrate((long)(duration * 1000));
     }
 
- 	public static String getVersion() {
- 		try {
- 			String version = Cocos2dxActivity.getContext().getPackageManager().getPackageInfo(Cocos2dxActivity.getContext().getPackageName(), 0).versionName;
- 			return version;
- 		} catch(Exception e) {
- 			return "";
- 		}
- 	}
+    public static String getVersion() {
+        try {
+            String version = Cocos2dxActivity.getContext().getPackageManager().getPackageInfo(Cocos2dxActivity.getContext().getPackageName(), 0).versionName;
+            return version;
+        } catch(Exception e) {
+            return "";
+        }
+    }
 
     public static boolean openURL(String url) { 
         boolean ret = false;
@@ -300,6 +301,15 @@ public class Cocos2dxHelper {
             }
         }
         return array;
+    }
+
+    public static void startFmod() {
+        Cocos2dxHelper.sCocos2dFmod = new Cocos2dxFmod(activity);
+        Cocos2dxHelper.sCocos2dFmod.start();
+    }
+
+    public static void stopFmod() {
+        Cocos2dxHelper.sCocos2dFmod.stop();
     }
 
     public static void preloadBackgroundMusic(final String pPath) {

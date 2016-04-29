@@ -38,15 +38,15 @@ def caculate_built_samples(args):
     targets = set(targets)
     return list(targets)
 
-def do_build(app_android_root, build_mode):
+def do_build(app_android_root, build_mode, use_fmod):
 
-    command = 'cocos compile -p android -s %s --ndk-mode %s' % (app_android_root, build_mode)
+    command = 'cocos compile -p android -s %s --ndk-mode %s --fmod %s' % (app_android_root, build_mode, use_fmod)
     print command
 
     if os.system(command) != 0:
         raise Exception("Build dynamic library for project [ " + app_android_root + " ] fails!")
 
-def build_samples(target, build_mode):
+def build_samples(target, build_mode, use_fmod):
 
     if build_mode is None:
         build_mode = 'debug'
@@ -76,7 +76,7 @@ def build_samples(target, build_mode):
             print 'unknown target: %s' % target
             continue
 
-        do_build(app_android_root, build_mode)
+        do_build(app_android_root, build_mode, use_fmod)
 
 # -------------- main --------------
 if __name__ == '__main__':
@@ -104,6 +104,8 @@ if __name__ == '__main__':
                       help='The build mode for java project,debug[default] or release. \
                       Get more information, \
                       please refer to http://developer.android.com/tools/building/building-cmdline.html')
+    parser.add_option("-f", "--fmod", dest="use_fmod",
+                      help='Enable Fmod library')
     (opts, args) = parser.parse_args()
 
     if len(args) == 0:
@@ -111,7 +113,7 @@ if __name__ == '__main__':
         sys.exit(1)
     else:
         try:
-            build_samples(args, opts.build_mode)
+            build_samples(args, opts.build_mode, opts.use_fmod)
         except Exception as e:
             print e
             sys.exit(1)

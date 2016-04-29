@@ -93,6 +93,10 @@ if(LINUX)
   list(APPEND all_prebuilt_libs fmod)
 endif()
 
+if (ANDROID AND USE_ANDROID_FMOD)
+  list(APPEND all_prebuilt_libs fmod)
+endif()
+
 # END CONFIG
 
 foreach(_lib ${all_prebuilt_libs})
