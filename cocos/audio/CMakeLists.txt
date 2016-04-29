@@ -15,11 +15,16 @@ if(WINDOWS)
 
 ELSEIF(ANDROID)
     set(COCOS_AUDIO_PLATFORM_SRC
-        audio/android/AudioEngine-inl.cpp
         audio/android/ccdandroidUtils.cpp
         audio/android/cddSimpleAudioEngine.cpp
         audio/android/jni/cddandroidAndroidJavaEngine.cpp
     )
+
+    if(USE_ANDROID_FMOD)
+        list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/android/AudioEngine-fmod.cpp)
+    else()
+        list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/android/AudioEngine-inl.cpp)
+    endif()
 
 elseif(LINUX)
     set(COCOS_AUDIO_PLATFORM_SRC

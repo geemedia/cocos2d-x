@@ -5,5 +5,8 @@
     "repo_parent":"https://github.com/cocos2d/",
     "move_dirs":{
         "fbx-conv":"tools"
+    },
+    "copy_files":{
+        "fmod/prebuilt/android/fmodex.jar":"cocos/platform/android/java/libs/fmodex.jar"
     }
 }

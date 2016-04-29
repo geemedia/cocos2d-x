@@ -90,7 +90,7 @@ extern int getObbAssetFileDescriptorJNI(const char* path, long* startOffset, lon
     JniMethodInfo methodInfo;
     int fd = 0;
     
-    if (JniHelper::getStaticMethodInfo(methodInfo, CLASS_NAME, "getObbAssetFileDescriptor", "(Ljava/lang/String;)[J")) {
+    if (JniHelper::getStaticMethodInfo(methodInfo, className.c_str(), "getObbAssetFileDescriptor", "(Ljava/lang/String;)[J")) {
         jstring stringArg = methodInfo.env->NewStringUTF(path);
         jlongArray newArray = (jlongArray)methodInfo.env->CallStaticObjectMethod(methodInfo.classID, methodInfo.methodID, stringArg);
         jsize theArrayLen = methodInfo.env->GetArrayLength(newArray);
@@ -109,6 +109,24 @@ extern int getObbAssetFileDescriptorJNI(const char* path, long* startOffset, lon
     }
     
     return fd;
+}
+
+void startFmodJNI() {
+    JniMethodInfo t;
+
+    if (JniHelper::getStaticMethodInfo(t, className.c_str(), "startFmod", "()V")) {
+        t.env->CallStaticVoidMethod(t.classID, t.methodID);
+        t.env->DeleteLocalRef(t.classID);
+    }
+}
+
+void stopFmodJNI() {
+    JniMethodInfo t;
+
+    if (JniHelper::getStaticMethodInfo(t, className.c_str(), "stopFmod", "()V")) {
+        t.env->CallStaticVoidMethod(t.classID, t.methodID);
+        t.env->DeleteLocalRef(t.classID);
+    }
 }
 
 void conversionEncodingJNI(const char* src, int byteSize, const char* fromCharset, char* dst, const char* newCharset)
