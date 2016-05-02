@@ -62,7 +62,7 @@ set(_zlib_libs z libzlib libz)
 
 set(_fmod_prefix FMOD)
 set(_fmod_inc fmod.hpp)
-set(_fmod_libs fmod fmod64 fmod fmod64)
+set(_fmod_libs fmod fmod64 fmod fmod64 fmodex)
 
 set(all_prebuilt_libs
   chipmunk
