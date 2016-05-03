@@ -156,18 +156,18 @@ class CocosZipInstaller(object):
         if not os.path.exists(target):
             os.mkdir(target)
 
-    def unpack_zipfile(self, extract_dir):
+    def unpack_zipfile(self, filename, extract_dir):
         """Unpack zip `filename` to `extract_dir`
 
         Raises ``UnrecognizedFormat`` if `filename` is not a zipfile (as determined
         by ``zipfile.is_zipfile()``).
         """
 
-        if not zipfile.is_zipfile(self._filename):
-            raise UnrecognizedFormat("%s is not a zip file" % (self._filename))
+        if not zipfile.is_zipfile(filename):
+            raise UnrecognizedFormat("%s is not a zip file" % (filename))
 
         print("==> Extracting files, please wait ...")
-        z = zipfile.ZipFile(self._filename)
+        z = zipfile.ZipFile(filename)
         try:
             for info in z.infolist():
                 name = info.filename
@@ -239,7 +239,23 @@ class CocosZipInstaller(object):
             data = json.load(data_file)
         return data
 
-    def run(self, workpath, folder_for_extracting, remove_downloaded, force_update, download_only):
+    def download_fmod_zip(self, folder_for_extracting):
+        from shutil import copyfile
+        remote_fmod_dir = '\\\orion.dti-soft.dtisoft.com\\FrameWork\\software\\cocos\\fmod\\'
+        fmod_filename = 'fmod.zip'
+        target_folder = folder_for_extracting + '\\fmod'
+        if os.path.exists(target_folder):
+            return
+
+        file_to_extract = os.path.join(folder_for_extracting, fmod_filename)
+        copyfile(remote_fmod_dir+fmod_filename, folder_for_extracting + '\\' + fmod_filename)
+        self.unpack_zipfile(file_to_extract, folder_for_extracting)
+        os.remove(folder_for_extracting + '\\' + fmod_filename)
+
+    def run(self, workpath, folder_for_extracting, remove_downloaded, force_update, download_only, download_android_fmod):
+        if download_android_fmod:
+            self.download_fmod_zip(folder_for_extracting)
+
         if not force_update and not self.need_to_update():
             print("==> Not need to update!")
             return
@@ -250,7 +266,7 @@ class CocosZipInstaller(object):
         self.download_zip_file()
 
         if not download_only:
-            self.unpack_zipfile(self._workpath)
+            self.unpack_zipfile(self._filename, self._workpath)
             print("==> Copying files...")
             if not os.path.exists(folder_for_extracting):
                 os.mkdir(folder_for_extracting)
@@ -303,13 +319,17 @@ def main():
                       action="store_true", dest="download_only", default=False,
                       help="Only download zip file of the third party libraries, will not extract it")
 
+    parser.add_option("-m", "--download-android-fmod",
+                      action="store_true", dest="download_android_fmod", default=True,
+                      help="Download zip file containing fmod Android libraries and extracts its content in the external folder")
+
     (opts, args) = parser.parse_args()
 
     print("=======================================================")
     print("==> Prepare to download external libraries!")
     external_path = os.path.join(workpath, 'external')
     installer = CocosZipInstaller(workpath, os.path.join(workpath, 'external', 'config.json'), os.path.join(workpath, 'external', 'version.json'), "prebuilt_libs_version")
-    installer.run(workpath, external_path, opts.remove_downloaded, opts.force_update, opts.download_only)
+    installer.run(workpath, external_path, opts.remove_downloaded, opts.force_update, opts.download_only, opts.download_android_fmod)
 
 # -------------- main --------------
 if __name__ == '__main__':
