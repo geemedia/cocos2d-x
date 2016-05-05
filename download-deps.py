@@ -244,7 +244,6 @@ class CocosZipInstaller(object):
 
     def download_fmod_zip(self, folder_for_extracting):
         from shutil import copyfile
-        remote_fmod_dir = '\\\\orion.dti-soft.dtisoft.com\\FrameWork\\software\\cocos\\fmod\\'
         fmod_filename = 'fmod.zip'
         target_folder = os.path.join(folder_for_extracting, 'fmod')
         if os.path.exists(target_folder):
@@ -262,6 +261,7 @@ class CocosZipInstaller(object):
             self.unpack_zipfile(file_to_extract, folder_for_extracting)
             unmount_orion_linux(mount_point)
         else:
+            remote_fmod_dir = '\\\\orion.dti-soft.dtisoft.com\\FrameWork\\software\\cocos\\fmod\\'
             file_to_extract = os.path.join(folder_for_extracting, fmod_filename)
             copyfile(os.path.join(remote_fmod_dir, fmod_filename), os.path.join(folder_for_extracting, fmod_filename))
             self.unpack_zipfile(file_to_extract, folder_for_extracting)
