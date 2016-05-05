@@ -259,19 +259,17 @@ class CocosZipInstaller(object):
             remote_fmod_dir = mount_point
             file_to_extract = os.path.join(mount_point, fmod_filename)
             self.unpack_zipfile(file_to_extract, folder_for_extracting)
-            jar_source = os.path.join(folder_for_extracting, "fmod/prebuilt/android/fmodex.jar")
-            jar_destination = os.path.join(workpath, "cocos/platform/android/java/libs/fmodex.jar")
-            copyfile(jar_source, os.path.join(folder_for_extracting, jar_destination))
             unmount_orion_linux(mount_point)
         else:
             remote_fmod_dir = '\\\\orion.dti-soft.dtisoft.com\\FrameWork\\software\\cocos\\fmod\\'
             file_to_extract = os.path.join(folder_for_extracting, fmod_filename)
             copyfile(os.path.join(remote_fmod_dir, fmod_filename), os.path.join(folder_for_extracting, fmod_filename))
-            self.unpack_zipfile(file_to_extract, folder_for_extracting)
-            jar_source = os.path.join(folder_for_extracting, "fmod\\prebuilt\\android\\fmodex.jar")
-            jar_destination = os.path.join(workpath, "cocos\\platform\\android\\java\\libs\\fmodex.jar")
-            copyfile(jar_source, os.path.join(folder_for_extracting, jar_destination))
+            self.unpack_zipfile(file_to_extract, folder_for_extracting)            
             os.remove(file_to_extract)
+
+        jar_source = os.path.join(folder_for_extracting, 'fmod', 'prebuilt', 'android', 'fmodex.jar')
+        jar_destination = os.path.join(workpath, 'cocos', 'platform', 'android', 'java', 'libs', 'fmodex.jar')
+        copyfile(jar_source, os.path.join(folder_for_extracting, jar_destination))
 
     def run(self, workpath, folder_for_extracting, remove_downloaded, force_update, download_only, disable_download_android_fmod):
         if not disable_download_android_fmod:
