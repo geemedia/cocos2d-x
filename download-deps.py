@@ -81,6 +81,7 @@ class CocosZipInstaller(object):
         self._zip_file_size = int(data["zip_file_size"])
         # 'v' letter was swallowed by github, so we need to substring it from the 2nd letter
         self._extracted_folder_name = os.path.join(self._workpath, self._repo_name + '-' + self._current_version[1:])
+        self._fmod_jar_filename =  data["fmod_jar_filename"]
 
         try:
             data = self.load_json_file(version_path)
@@ -242,7 +243,6 @@ class CocosZipInstaller(object):
         return data
 
     def download_fmod_zip(self, workpath, folder_for_extracting):
-        from shutil import copyfile
         fmod_filename = 'fmod.zip'
         target_folder = os.path.join(folder_for_extracting, 'fmod')
         if os.path.exists(target_folder):
@@ -262,13 +262,9 @@ class CocosZipInstaller(object):
         else:
             remote_fmod_dir = '\\\\orion.dti-soft.dtisoft.com\\FrameWork\\software\\cocos\\fmod\\'
             file_to_extract = os.path.join(folder_for_extracting, fmod_filename)
-            copyfile(os.path.join(remote_fmod_dir, fmod_filename), os.path.join(folder_for_extracting, fmod_filename))
+            shutil.copyfile(os.path.join(remote_fmod_dir, fmod_filename), os.path.join(folder_for_extracting, fmod_filename))
             self.unpack_zipfile(file_to_extract, folder_for_extracting)            
             os.remove(file_to_extract)
-
-        jar_source = os.path.join(folder_for_extracting, 'fmod', 'prebuilt', 'android', 'fmodex.jar')
-        jar_destination = os.path.join(workpath, 'cocos', 'platform', 'android', 'java', 'libs', 'fmodex.jar')
-        copyfile(jar_source, os.path.join(folder_for_extracting, jar_destination))
 
     def run(self, workpath, folder_for_extracting, remove_downloaded, force_update, download_only, disable_download_android_fmod):
         if not disable_download_android_fmod:
@@ -304,6 +300,11 @@ class CocosZipInstaller(object):
                         os.remove(self._filename)
                 elif self.ask_to_delete_downloaded_zip_file():
                     os.remove(self._filename)
+            if os.path.exists(os.path.join(folder_for_extracting, 'fmod')):
+                jar_source = os.path.join(folder_for_extracting, 'fmod', 'prebuilt', 'android', self._fmod_jar_filename)
+                jar_destination = os.path.join(workpath, 'cocos', 'platform', 'android', 'java', 'libs', self._fmod_jar_filename)
+                shutil.copyfile(jar_source, os.path.join(folder_for_extracting, jar_destination))
+
         else:
             print("==> Download (%s) finish!" % self._filename)
 
