@@ -45,7 +45,7 @@ import distutils
 import fileinput
 import json
 import platform
-from helper_download_fmod import (mount_orion_linux, unmount_orion_linux)
+from helper_download_fmod import mount_orion_linux, unmount_orion_linux
 
 from optparse import OptionParser
 from time import time
