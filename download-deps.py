@@ -76,12 +76,15 @@ class CocosZipInstaller(object):
             self._move_dirs = data["move_dirs"]
         except:
             self._move_dirs = None
+        try:
+            self._copy_files = data["copy_files"]
+        except:
+            self._copy_files = None
         self._filename = self._current_version + '.zip'
         self._url = data["repo_parent"] + self._repo_name + '/archive/' + self._filename
         self._zip_file_size = int(data["zip_file_size"])
         # 'v' letter was swallowed by github, so we need to substring it from the 2nd letter
         self._extracted_folder_name = os.path.join(self._workpath, self._repo_name + '-' + self._current_version[1:])
-        self._fmod_jar_filename =  data["fmod_jar_filename"]
 
         try:
             data = self.load_json_file(version_path)
@@ -301,10 +304,11 @@ class CocosZipInstaller(object):
                 elif self.ask_to_delete_downloaded_zip_file():
                     os.remove(self._filename)
             if os.path.exists(os.path.join(folder_for_extracting, 'fmod')):
-                jar_source = os.path.join(folder_for_extracting, 'fmod', 'prebuilt', 'android', self._fmod_jar_filename)
-                jar_destination = os.path.join(workpath, 'cocos', 'platform', 'android', 'java', 'libs', self._fmod_jar_filename)
-                shutil.copyfile(jar_source, os.path.join(folder_for_extracting, jar_destination))
-
+                if self._copy_files is not None:
+                    for srcFile in self._copy_files.keys():
+                        srcCopyFile = os.path.join(folder_for_extracting, srcFile)
+                        dstCopyFile = os.path.join(workpath, self._copy_files[srcFile])
+                        shutil.copyfile(srcCopyFile, dstCopyFile)
         else:
             print("==> Download (%s) finish!" % self._filename)
 

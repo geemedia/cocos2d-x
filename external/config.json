@@ -6,5 +6,7 @@
     "move_dirs":{
         "fbx-conv":"tools"
     },
-    "fmod_jar_filename":"fmodex.jar"
+    "copy_files":{
+        "fmod/prebuilt/android/fmodex.jar":"cocos/platform/android/java/libs/fmodex.jar"
+    }
 }
