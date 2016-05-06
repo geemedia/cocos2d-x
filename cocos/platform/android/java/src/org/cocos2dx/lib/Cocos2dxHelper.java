@@ -304,7 +304,7 @@ public class Cocos2dxHelper {
     }
 
     public static void startFmod() {
-        Cocos2dxHelper.sCocos2dFmod = new Cocos2dxFmod(activity);
+        Cocos2dxHelper.sCocos2dFmod = new Cocos2dxFmod(sActivity);
         Cocos2dxHelper.sCocos2dFmod.start();
     }
 
