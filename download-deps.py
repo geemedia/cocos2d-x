@@ -294,6 +294,12 @@ class CocosZipInstaller(object):
                     if os.path.exists(distDir):
                         shutil.rmtree(distDir)
                     shutil.move( os.path.join(folder_for_extracting, srcDir), distDir)
+            if self._copy_files is not None:
+                for srcFile in self._copy_files.keys():
+                    srcCopyFile = os.path.join(folder_for_extracting, srcFile)
+                    if os.path.isfile(srcCopyFile):
+                        dstCopyFile = os.path.join(workpath, self._copy_files[srcFile])
+                        shutil.copyfile(srcCopyFile, dstCopyFile)
             print("==> Cleaning...")
             if os.path.exists(self._extracted_folder_name):
                 shutil.rmtree(self._extracted_folder_name)
@@ -303,12 +309,6 @@ class CocosZipInstaller(object):
                         os.remove(self._filename)
                 elif self.ask_to_delete_downloaded_zip_file():
                     os.remove(self._filename)
-            if os.path.exists(os.path.join(folder_for_extracting, 'fmod')):
-                if self._copy_files is not None:
-                    for srcFile in self._copy_files.keys():
-                        srcCopyFile = os.path.join(folder_for_extracting, srcFile)
-                        dstCopyFile = os.path.join(workpath, self._copy_files[srcFile])
-                        shutil.copyfile(srcCopyFile, dstCopyFile)
         else:
             print("==> Download (%s) finish!" % self._filename)
 
