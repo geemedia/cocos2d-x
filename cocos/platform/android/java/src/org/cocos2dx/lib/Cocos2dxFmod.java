@@ -18,11 +18,6 @@ public class Cocos2dxFmod {
     private final Context mContext;
     private FMODAudioDevice mFmodAudioDevice = null;
 
-    static 
-    {
-        System.loadLibrary("fmodex");
-    }
-
     // ===========================================================
     // Constructors
     // ===========================================================
