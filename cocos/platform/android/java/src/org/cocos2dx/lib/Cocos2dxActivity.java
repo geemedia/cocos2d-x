@@ -241,10 +241,11 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     }
     
     protected void onLoadNativeLibraries() {
+        // Only the games built with fmod will include the corresponding fmodex library
         try {
             System.loadLibrary("fmodex");
         } catch (Exception e) {
-            Log.w(TAG, "Could not load fmodex.so!");
+            Log.v(TAG, "Not using fmod.");
         }
         try {
             ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
