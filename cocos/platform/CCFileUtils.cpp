@@ -962,13 +962,20 @@ void FileUtils::addSearchPath(const std::string &searchpath,const bool front)
     }
 }
 
-void FileUtils::setFilenameLookupDictionary(const ValueMap& filenameLookupDict)
+void FileUtils::setFilenameLookupDictionary(const ValueMap& filenameLookupDict, bool clearPrevious)
 {
-    _fullPathCache.clear();
+  _fullPathCache.clear();  // Always clear the cache, in case a new value overwrites an existing one.
+
+  if (clearPrevious) {
     _filenameLookupDict = filenameLookupDict;
+  } else {
+    for (auto it = filenameLookupDict.begin(); it != filenameLookupDict.end(); ++it) {
+      _filenameLookupDict[it->first] = it->second;
+    }
+  }
 }
 
-void FileUtils::loadFilenameLookupDictionaryFromFile(const std::string &filename)
+void FileUtils::loadFilenameLookupDictionaryFromFile(const std::string &filename, bool clearPrevious)
 {
     const std::string fullPath = fullPathForFilename(filename);
     if (!fullPath.empty())
@@ -983,7 +990,7 @@ void FileUtils::loadFilenameLookupDictionaryFromFile(const std::string &filename
                 CCLOG("cocos2d: ERROR: Invalid filenameLookup dictionary version: %d. Filename: %s", version, filename.c_str());
                 return;
             }
-            setFilenameLookupDictionary( dict["filenames"].asValueMap());
+            setFilenameLookupDictionary( dict["filenames"].asValueMap(), clearPrevious);
         }
     }
 }

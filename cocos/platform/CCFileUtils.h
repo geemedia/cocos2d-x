@@ -196,20 +196,22 @@ public:
      * </plist>
      * @endcode
      * @param filename The plist file name.
+     * @param clearPrevious If true (the default), clear any mapping previously set.
      *
      @since v2.1
      * @js loadFilenameLookup
      * @lua loadFilenameLookup
      */
-    virtual void loadFilenameLookupDictionaryFromFile(const std::string &filename);
+    virtual void loadFilenameLookupDictionaryFromFile(const std::string &filename, bool clearPrevious = true);
 
     /**
      *  Sets the filenameLookup dictionary.
      *
      *  @param pFilenameLookupDict The dictionary for replacing filename.
+     *  @param clearPrevious If true (the default), clear any mapping previously set.
      *  @since v2.1
      */
-    virtual void setFilenameLookupDictionary(const ValueMap& filenameLookupDict);
+    virtual void setFilenameLookupDictionary(const ValueMap& filenameLookupDict, bool clearPrevious = true);
 
     /**
      *  Gets full path from a file name and the path of the relative file.
