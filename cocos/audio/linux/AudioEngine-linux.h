@@ -31,7 +31,7 @@
 #include <functional>
 #include <iostream>
 #include <map>
-#ifndef LINUX_ARM
+#ifndef CC_DISABLE_FMOD
 #include "fmod.hpp"
 #include "fmod_errors.h"
 #endif
@@ -73,13 +73,13 @@ public:
     /**
      * used internally by ffmod callback 
      */ 
-#ifndef LINUX_ARM
+#ifndef CC_DISABLE_FMOD
     void onSoundFinished(FMOD::Channel * channel); 
 #endif
 
 private:
 
-#ifndef LINUX_ARM
+#ifndef CC_DISABLE_FMOD
     /**
     * returns null if a sound with the given path is not found
     */
