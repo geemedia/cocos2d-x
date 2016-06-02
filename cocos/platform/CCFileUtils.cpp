@@ -962,37 +962,22 @@ void FileUtils::addSearchPath(const std::string &searchpath,const bool front)
     }
 }
 
-void FileUtils::setFilenameLookupDictionary(const ValueMap& filenameLookupDict, bool clearPrevious)
+void FileUtils::setFilenameLookupDictionary(const ValueMap& filenameLookupDict)
 {
-  _fullPathCache.clear();  // Always clear the cache, in case a new value overwrites an existing one.
-
-  if (clearPrevious) {
-    _filenameLookupDict = filenameLookupDict;
-  } else {
-    for (auto it = filenameLookupDict.begin(); it != filenameLookupDict.end(); ++it) {
-      _filenameLookupDict[it->first] = it->second;
-    }
-  }
+    setFilenameLookupDictionaryImpl(filenameLookupDict, true);
 }
 
-void FileUtils::loadFilenameLookupDictionaryFromFile(const std::string &filename, bool clearPrevious)
+void FileUtils::appendFilenameLookupDictionary(const ValueMap& filenameLookupDict) {
+  setFilenameLookupDictionaryImpl(filenameLookupDict, false);
+}
+
+void FileUtils::loadFilenameLookupDictionaryFromFile(const std::string &filename)
 {
-    const std::string fullPath = fullPathForFilename(filename);
-    if (!fullPath.empty())
-    {
-        ValueMap dict = FileUtils::getInstance()->getValueMapFromFile(fullPath);
-        if (!dict.empty())
-        {
-            ValueMap& metadata =  dict["metadata"].asValueMap();
-            int version = metadata["version"].asInt();
-            if (version != 1)
-            {
-                CCLOG("cocos2d: ERROR: Invalid filenameLookup dictionary version: %d. Filename: %s", version, filename.c_str());
-                return;
-            }
-            setFilenameLookupDictionary( dict["filenames"].asValueMap(), clearPrevious);
-        }
-    }
+    loadFilenameLookupDictionaryFromFileImpl(filename, true);
+}
+
+void FileUtils::appendFilenameLookupDictionaryFromFile(const std::string &filename) {
+  loadFilenameLookupDictionaryFromFileImpl(filename, false);
 }
 
 std::string FileUtils::getFullPathForDirectoryAndFilename(const std::string& directory, const std::string& filename) const
@@ -1063,6 +1048,34 @@ bool FileUtils::isDirectoryExist(const std::string& dirPath) const
         }
     }
     return false;
+}
+
+void FileUtils::setFilenameLookupDictionaryImpl(const ValueMap& filenameLookupDict, bool clearPrevious) {
+  _fullPathCache.clear();  // Always clear the cache, in case a new value overwrites an existing one.
+
+  if (clearPrevious) {
+    _filenameLookupDict = filenameLookupDict;
+  } else {
+    for (auto it = filenameLookupDict.begin(); it != filenameLookupDict.end(); ++it) {
+      _filenameLookupDict[it->first] = it->second;
+    }
+  }
+}
+
+void FileUtils::loadFilenameLookupDictionaryFromFileImpl(const std::string &filename, bool clearPrevious) {
+  const std::string fullPath = fullPathForFilename(filename);
+  if (!fullPath.empty()) {
+    ValueMap dict = FileUtils::getInstance()->getValueMapFromFile(fullPath);
+    if (!dict.empty()) {
+      ValueMap& metadata = dict["metadata"].asValueMap();
+      int version = metadata["version"].asInt();
+      if (version != 1) {
+        CCLOG("cocos2d: ERROR: Invalid filenameLookup dictionary version: %d. Filename: %s", version, filename.c_str());
+        return;
+      }
+      setFilenameLookupDictionaryImpl(dict["filenames"].asValueMap(), clearPrevious);
+    }
+  }
 }
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)

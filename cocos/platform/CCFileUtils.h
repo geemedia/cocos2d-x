@@ -196,22 +196,58 @@ public:
      * </plist>
      * @endcode
      * @param filename The plist file name.
-     * @param clearPrevious If true (the default), clear any mapping previously set.
      *
      @since v2.1
      * @js loadFilenameLookup
      * @lua loadFilenameLookup
      */
-    virtual void loadFilenameLookupDictionaryFromFile(const std::string &filename, bool clearPrevious = true);
+    virtual void loadFilenameLookupDictionaryFromFile(const std::string &filename);
+
+    /**
+    * Appends the filenameLookup dictionary from the contents of a filename.
+    *
+    * @note The plist file name should follow the format below:
+    *
+    * @code
+    * <?xml version="1.0" encoding="UTF-8"?>
+    * <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    * <plist version="1.0">
+    * <dict>
+    *     <key>filenames</key>
+    *     <dict>
+    *         <key>sounds/click.wav</key>
+    *         <string>sounds/click.caf</string>
+    *         <key>sounds/endgame.wav</key>
+    *         <string>sounds/endgame.caf</string>
+    *         <key>sounds/gem-0.wav</key>
+    *         <string>sounds/gem-0.caf</string>
+    *     </dict>
+    *     <key>metadata</key>
+    *     <dict>
+    *         <key>version</key>
+    *         <integer>1</integer>
+    *     </dict>
+    * </dict>
+    * </plist>
+    * @endcode
+    * @param filename The plist file name.
+    */
+    virtual void appendFilenameLookupDictionaryFromFile(const std::string &filename);
 
     /**
      *  Sets the filenameLookup dictionary.
      *
      *  @param pFilenameLookupDict The dictionary for replacing filename.
-     *  @param clearPrevious If true (the default), clear any mapping previously set.
      *  @since v2.1
      */
-    virtual void setFilenameLookupDictionary(const ValueMap& filenameLookupDict, bool clearPrevious = true);
+    virtual void setFilenameLookupDictionary(const ValueMap& filenameLookupDict);
+
+    /**
+    *  Sets the filenameLookup dictionary.
+    *
+    *  @param pFilenameLookupDict The dictionary for replacing filename.
+    */
+    virtual void appendFilenameLookupDictionary(const ValueMap& filenameLookupDict);
 
     /**
      *  Gets full path from a file name and the path of the relative file.
@@ -539,6 +575,46 @@ protected:
      *  @return The full path of the file, if the file can't be found, it will return an empty string.
      */
     virtual std::string getFullPathForDirectoryAndFilename(const std::string& directory, const std::string& filename) const;
+
+    /**
+    * Loads the filenameLookup dictionary from the contents of a filename.
+    *
+    * @note The plist file name should follow the format below:
+    *
+    * @code
+    * <?xml version="1.0" encoding="UTF-8"?>
+    * <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    * <plist version="1.0">
+    * <dict>
+    *     <key>filenames</key>
+    *     <dict>
+    *         <key>sounds/click.wav</key>
+    *         <string>sounds/click.caf</string>
+    *         <key>sounds/endgame.wav</key>
+    *         <string>sounds/endgame.caf</string>
+    *         <key>sounds/gem-0.wav</key>
+    *         <string>sounds/gem-0.caf</string>
+    *     </dict>
+    *     <key>metadata</key>
+    *     <dict>
+    *         <key>version</key>
+    *         <integer>1</integer>
+    *     </dict>
+    * </dict>
+    * </plist>
+    * @endcode
+    * @param filename The plist file name.
+    * @param clearPrevious If true, clear any mapping previously set.
+    */
+    virtual void loadFilenameLookupDictionaryFromFileImpl(const std::string &filename, bool clearPrevious);
+
+    /**
+    *  Sets the filenameLookup dictionary.
+    *
+    *  @param pFilenameLookupDict The dictionary for replacing filename.
+    *  @param clearPrevious If true, clear any mapping previously set.
+    */
+    virtual void setFilenameLookupDictionaryImpl(const ValueMap& filenameLookupDict, bool clearPrevious);
 
     /** Dictionary used to lookup filenames based on a key.
      *  It is used internally by the following methods:
