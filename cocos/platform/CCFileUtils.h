@@ -556,10 +556,10 @@ protected:
     * Fills the provided filenameLookup dictionary value map from a file.
     * @return `true` if the provided file exists and the content is valid.
     * @param filename The plist file name.
-    * @param filenameLookupDict The value map to be filled.
+    * @param filenameLookupDict [out] The value map to be filled.
     * @note See loadFilenameLookupDictionaryFromFile() for file format.
     */
-    virtual bool fillFilenameLookupDictionaryMapFromFile(const std::string &filename, ValueMap& filenameLookupDict) const;
+    virtual bool fillFilenameLookupDictionaryMapFromFile(const std::string &filename, ValueMap* filenameLookupDict) const;
 
     /** Dictionary used to lookup filenames based on a key.
      *  It is used internally by the following methods:

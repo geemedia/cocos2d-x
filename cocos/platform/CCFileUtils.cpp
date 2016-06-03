@@ -971,8 +971,8 @@ void FileUtils::setFilenameLookupDictionary(const ValueMap& filenameLookupDict)
 void FileUtils::appendFilenameLookupDictionary(const ValueMap& filenameLookupDict) {
     _fullPathCache.clear();  // Clear the cache, in case a new value overwrites an existing one.
 
-    for (auto it = filenameLookupDict.begin(); it != filenameLookupDict.end(); ++it) {
-        _filenameLookupDict[it->first] = it->second;
+    for (auto&& it : filenameLookupDict) {
+        _filenameLookupDict[it.first] = it.second;
     }
 }
 
@@ -980,7 +980,7 @@ void FileUtils::loadFilenameLookupDictionaryFromFile(const std::string &filename
 {
     ValueMap filenameLookupDict;
 
-    if (fillFilenameLookupDictionaryMapFromFile(filename, filenameLookupDict)) {
+    if (fillFilenameLookupDictionaryMapFromFile(filename, &filenameLookupDict)) {
         setFilenameLookupDictionary(filenameLookupDict);
     }
 }
@@ -988,7 +988,7 @@ void FileUtils::loadFilenameLookupDictionaryFromFile(const std::string &filename
 void FileUtils::appendFilenameLookupDictionaryFromFile(const std::string &filename) {
     ValueMap filenameLookupDict;
 
-    if (fillFilenameLookupDictionaryMapFromFile(filename, filenameLookupDict)) {
+    if (fillFilenameLookupDictionaryMapFromFile(filename, &filenameLookupDict)) {
         appendFilenameLookupDictionary(filenameLookupDict);
     }
 }
@@ -1063,7 +1063,11 @@ bool FileUtils::isDirectoryExist(const std::string& dirPath) const
     return false;
 }
 
-bool FileUtils::fillFilenameLookupDictionaryMapFromFile(const std::string &filename, ValueMap& filenameLookupDict) const {
+bool FileUtils::fillFilenameLookupDictionaryMapFromFile(const std::string &filename, ValueMap* filenameLookupDict) const {
+    if (!filenameLookupDict) {
+        return false;
+    }
+
     const std::string fullPath = fullPathForFilename(filename);
 
     if (fullPath.empty()) {
@@ -1084,7 +1088,7 @@ bool FileUtils::fillFilenameLookupDictionaryMapFromFile(const std::string &filen
         return false;
     }
 
-    filenameLookupDict = dict["filenames"].asValueMap();
+    *filenameLookupDict = dict["filenames"].asValueMap();
     return true;
 }
 
