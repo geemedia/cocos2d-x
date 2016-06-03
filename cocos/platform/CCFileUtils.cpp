@@ -964,20 +964,33 @@ void FileUtils::addSearchPath(const std::string &searchpath,const bool front)
 
 void FileUtils::setFilenameLookupDictionary(const ValueMap& filenameLookupDict)
 {
-    setFilenameLookupDictionaryImpl(filenameLookupDict, true);
+    _fullPathCache.clear();
+    _filenameLookupDict = filenameLookupDict;
 }
 
 void FileUtils::appendFilenameLookupDictionary(const ValueMap& filenameLookupDict) {
-  setFilenameLookupDictionaryImpl(filenameLookupDict, false);
+    _fullPathCache.clear();  // Clear the cache, in case a new value overwrites an existing one.
+
+    for (auto it = filenameLookupDict.begin(); it != filenameLookupDict.end(); ++it) {
+        _filenameLookupDict[it->first] = it->second;
+    }
 }
 
 void FileUtils::loadFilenameLookupDictionaryFromFile(const std::string &filename)
 {
-    loadFilenameLookupDictionaryFromFileImpl(filename, true);
+    ValueMap filenameLookupDict;
+
+    if (fillFilenameLookupDictionaryMapFromFile(filename, filenameLookupDict)) {
+        setFilenameLookupDictionary(filenameLookupDict);
+    }
 }
 
 void FileUtils::appendFilenameLookupDictionaryFromFile(const std::string &filename) {
-  loadFilenameLookupDictionaryFromFileImpl(filename, false);
+    ValueMap filenameLookupDict;
+
+    if (fillFilenameLookupDictionaryMapFromFile(filename, filenameLookupDict)) {
+        appendFilenameLookupDictionary(filenameLookupDict);
+    }
 }
 
 std::string FileUtils::getFullPathForDirectoryAndFilename(const std::string& directory, const std::string& filename) const
@@ -1050,32 +1063,29 @@ bool FileUtils::isDirectoryExist(const std::string& dirPath) const
     return false;
 }
 
-void FileUtils::setFilenameLookupDictionaryImpl(const ValueMap& filenameLookupDict, bool clearPrevious) {
-  _fullPathCache.clear();  // Always clear the cache, in case a new value overwrites an existing one.
+bool FileUtils::fillFilenameLookupDictionaryMapFromFile(const std::string &filename, ValueMap& filenameLookupDict) const {
+    const std::string fullPath = fullPathForFilename(filename);
 
-  if (clearPrevious) {
-    _filenameLookupDict = filenameLookupDict;
-  } else {
-    for (auto it = filenameLookupDict.begin(); it != filenameLookupDict.end(); ++it) {
-      _filenameLookupDict[it->first] = it->second;
+    if (fullPath.empty()) {
+        return false;
     }
-  }
-}
 
-void FileUtils::loadFilenameLookupDictionaryFromFileImpl(const std::string &filename, bool clearPrevious) {
-  const std::string fullPath = fullPathForFilename(filename);
-  if (!fullPath.empty()) {
     ValueMap dict = FileUtils::getInstance()->getValueMapFromFile(fullPath);
-    if (!dict.empty()) {
-      ValueMap& metadata = dict["metadata"].asValueMap();
-      int version = metadata["version"].asInt();
-      if (version != 1) {
-        CCLOG("cocos2d: ERROR: Invalid filenameLookup dictionary version: %d. Filename: %s", version, filename.c_str());
-        return;
-      }
-      setFilenameLookupDictionaryImpl(dict["filenames"].asValueMap(), clearPrevious);
+
+    if (dict.empty()) {
+        return false;
     }
-  }
+
+    ValueMap& metadata = dict["metadata"].asValueMap();
+    int version = metadata["version"].asInt();
+
+    if (version != 1) {
+        CCLOG("cocos2d: ERROR: Invalid filenameLookup dictionary version: %d. Filename: %s", version, filename.c_str());
+        return false;
+    }
+
+    filenameLookupDict = dict["filenames"].asValueMap();
+    return true;
 }
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
