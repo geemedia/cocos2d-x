@@ -976,7 +976,7 @@ void FileUtils::appendFilenameLookupDictionary(const ValueMap& filenameLookupDic
     }
 }
 
-void FileUtils::loadFilenameLookupDictionaryFromFile(const std::string &filename)
+void FileUtils::loadFilenameLookupDictionaryFromFile(const std::string& filename)
 {
     ValueMap filenameLookupDict;
 
@@ -985,7 +985,7 @@ void FileUtils::loadFilenameLookupDictionaryFromFile(const std::string &filename
     }
 }
 
-void FileUtils::appendFilenameLookupDictionaryFromFile(const std::string &filename) {
+void FileUtils::appendFilenameLookupDictionaryFromFile(const std::string& filename) {
     ValueMap filenameLookupDict;
 
     if (fillFilenameLookupDictionaryMapFromFile(filename, &filenameLookupDict)) {
@@ -1063,7 +1063,7 @@ bool FileUtils::isDirectoryExist(const std::string& dirPath) const
     return false;
 }
 
-bool FileUtils::fillFilenameLookupDictionaryMapFromFile(const std::string &filename, ValueMap* filenameLookupDict) const {
+bool FileUtils::fillFilenameLookupDictionaryMapFromFile(const std::string& filename, ValueMap* filenameLookupDict) const {
     if (!filenameLookupDict) {
         return false;
     }
