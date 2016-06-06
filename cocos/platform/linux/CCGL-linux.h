@@ -87,7 +87,7 @@ THE SOFTWARE.
 #define GL_DEPTH24_STENCIL8 0
 #define CC_GL_DEPTH24_STENCIL8      GL_DEPTH24_STENCIL8
 
-#elif !defined(LINUX_ARM)
+#elif !defined(GLFW_INCLUDE_ES2)
 
 #include "GL/glew.h"
 
