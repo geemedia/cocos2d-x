@@ -45,7 +45,7 @@ import distutils
 import fileinput
 import json
 import platform
-from helper_download_fmod import mount_orion_linux, unmount_orion_linux
+from dodo_prebuilds import retrieve_prebuild
 
 from optparse import OptionParser
 from time import time
@@ -246,28 +246,10 @@ class CocosZipInstaller(object):
         return data
 
     def download_fmod_zip(self, workpath, folder_for_extracting):
-        fmod_filename = 'fmod.zip'
-        target_folder = os.path.join(folder_for_extracting, 'fmod')
-        if os.path.exists(target_folder):
-            print("Folder %s already exists in external" % (target_folder))
-            return
-
-        file_to_extract = os.path.join(folder_for_extracting, fmod_filename)
-
-        if platform.system() == 'Linux':
-            remote_fmod_dir = '//192.168.3.150/FrameWork/software/cocos/fmod'
-            mount_point = '/tmp/tmp_mount_fmod'
-            mount_orion_linux(remote_fmod_dir, mount_point)
-            remote_fmod_dir = mount_point
-            file_to_extract = os.path.join(mount_point, fmod_filename)
-            self.unpack_zipfile(file_to_extract, folder_for_extracting)
-            unmount_orion_linux(mount_point)
-        else:
-            remote_fmod_dir = '\\\\orion.dti-soft.dtisoft.com\\FrameWork\\software\\cocos\\fmod\\'
-            file_to_extract = os.path.join(folder_for_extracting, fmod_filename)
-            shutil.copyfile(os.path.join(remote_fmod_dir, fmod_filename), os.path.join(folder_for_extracting, fmod_filename))
-            self.unpack_zipfile(file_to_extract, folder_for_extracting)            
-            os.remove(file_to_extract)
+        file_to_extract = os.path.join(folder_for_extracting, 'fmod.zip')
+        retrieve_prebuild('fmod/fmod', file_to_extract)
+        self.unpack_zipfile(file_to_extract, folder_for_extracting)            
+        os.remove(file_to_extract)
 
     def run(self, workpath, folder_for_extracting, remove_downloaded, force_update, download_only, disable_download_android_fmod):
         if not disable_download_android_fmod:
