@@ -201,7 +201,14 @@ public:
      * @js loadFilenameLookup
      * @lua loadFilenameLookup
      */
-    virtual void loadFilenameLookupDictionaryFromFile(const std::string &filename);
+    virtual void loadFilenameLookupDictionaryFromFile(const std::string& filename);
+
+    /**
+    * Appends the filenameLookup dictionary from the contents of a filename.
+    * @param filename The plist file name.
+    * @note See loadFilenameLookupDictionaryFromFile() for file format.
+    */
+    virtual void appendFilenameLookupDictionaryFromFile(const std::string& filename);
 
     /**
      *  Sets the filenameLookup dictionary.
@@ -210,6 +217,13 @@ public:
      *  @since v2.1
      */
     virtual void setFilenameLookupDictionary(const ValueMap& filenameLookupDict);
+
+    /**
+    *  Sets the filenameLookup dictionary.
+    *
+    *  @param pFilenameLookupDict The dictionary for replacing filename.
+    */
+    virtual void appendFilenameLookupDictionary(const ValueMap& filenameLookupDict);
 
     /**
      *  Gets full path from a file name and the path of the relative file.
@@ -537,6 +551,15 @@ protected:
      *  @return The full path of the file, if the file can't be found, it will return an empty string.
      */
     virtual std::string getFullPathForDirectoryAndFilename(const std::string& directory, const std::string& filename) const;
+
+    /**
+    * Fills the provided filenameLookup dictionary value map from a file.
+    * @return `true` if the provided file exists and the content is valid.
+    * @param filename The plist file name.
+    * @param filenameLookupDict [out] The value map to be filled.
+    * @note See loadFilenameLookupDictionaryFromFile() for file format.
+    */
+    virtual bool fillFilenameLookupDictionaryMapFromFile(const std::string& filename, ValueMap* filenameLookupDict) const;
 
     /** Dictionary used to lookup filenames based on a key.
      *  It is used internally by the following methods:
