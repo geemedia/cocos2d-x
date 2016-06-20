@@ -328,8 +328,8 @@ bool Label::initWithTTF(const std::string& text, const std::string& fontFilePath
         {
             setDimensions(dimensions.width, dimensions.height);
             setString(text);
+            return true;
         }
-        return true;
     }
     return false;
 }

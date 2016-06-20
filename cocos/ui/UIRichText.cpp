@@ -35,6 +35,7 @@
 #include "base/CCDirector.h"
 #include "2d/CCLabel.h"
 #include "2d/CCSprite.h"
+#include "2d/CCSpriteFrameCache.h"
 #include "base/ccUTF8.h"
 #include "ui/UIHelper.h"
 
@@ -581,6 +582,26 @@ void RichText::setWrapMode(RichText::WrapMode wrapMode)
     }
 }
 
+static Label* createTextRenderer(const std::string& text, const std::string& fontName, float fontSize)
+{
+    Label* label;
+    if (FileUtils::getInstance()->isFileExist(fontName)) {
+        label = Label::createWithTTF(text, fontName, fontSize);
+        if (!label)
+            label = Label::createWithBMFont(fontName, text);
+    } else
+        label = Label::createWithSystemFont(text, fontName, fontSize);
+    return label;
+}
+
+static Sprite* createImageRenderer(const std::string& filePath)
+{
+    Sprite* sprite = Sprite::create(filePath);
+    if (!sprite)
+        sprite = Sprite::createWithSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName(filePath));
+    return sprite;
+}
+
 void RichText::formatText()
 {
     if (_formatTextDirty)
@@ -599,15 +620,7 @@ void RichText::formatText()
                     case RichElement::Type::TEXT:
                     {
                         RichElementText* elmtText = static_cast<RichElementText*>(element);
-                        Label* label;
-                        if (FileUtils::getInstance()->isFileExist(elmtText->_fontName))
-                        {
-                             label = Label::createWithTTF(elmtText->_text, elmtText->_fontName, elmtText->_fontSize);
-                        }
-                        else
-                        {
-                            label = Label::createWithSystemFont(elmtText->_text, elmtText->_fontName, elmtText->_fontSize);
-                        }
+                        Label* label = createTextRenderer(elmtText->_text, elmtText->_fontName, elmtText->_fontSize);
                         if (elmtText->_flags & RichElementText::ITALICS_FLAG)
                             label->enableItalics();
                         if (elmtText->_flags & RichElementText::BOLD_FLAG)
@@ -624,7 +637,7 @@ void RichText::formatText()
                     case RichElement::Type::IMAGE:
                     {
                         RichElementImage* elmtImage = static_cast<RichElementImage*>(element);
-                        elementRenderer = Sprite::create(elmtImage->_filePath);
+                        elementRenderer = createImageRenderer(elmtImage->_filePath);
                         if (elementRenderer && (elmtImage->_height != -1 || elmtImage->_width != -1))
                         {
                             auto currentSize = elementRenderer->getContentSize();
@@ -814,16 +827,7 @@ int RichText::findSplitPositionForChar(cocos2d::Label* label, const std::string&
 
 void RichText::handleTextRenderer(const std::string& text, const std::string& fontName, float fontSize, const Color3B &color, GLubyte opacity, uint32_t flags, const std::string& url)
 {
-    auto fileExist = FileUtils::getInstance()->isFileExist(fontName);
-    Label* textRenderer = nullptr;
-    if (fileExist)
-    {
-        textRenderer = Label::createWithTTF(text, fontName, fontSize);
-    } 
-    else
-    {
-        textRenderer = Label::createWithSystemFont(text, fontName, fontSize);
-    }
+    Label* textRenderer = createTextRenderer(text, fontName, fontSize);
     if (flags & RichElementText::ITALICS_FLAG)
         textRenderer->enableItalics();
     if (flags & RichElementText::BOLD_FLAG)
@@ -854,15 +858,7 @@ void RichText::handleTextRenderer(const std::string& text, const std::string& fo
         std::string cutWords = Helper::getSubStringOfUTF8String(text, rightStart, text.length() - leftLength);
         if (leftLength > 0)
         {
-            Label* leftRenderer = nullptr;
-            if (fileExist)
-            {
-                leftRenderer = Label::createWithTTF(Helper::getSubStringOfUTF8String(leftWords, 0, leftLength), fontName, fontSize);
-            }
-            else
-            {
-                leftRenderer = Label::createWithSystemFont(Helper::getSubStringOfUTF8String(leftWords, 0, leftLength), fontName, fontSize);
-            }
+            Label* leftRenderer = createTextRenderer(Helper::getSubStringOfUTF8String(leftWords, 0, leftLength), fontName, fontSize);
             if (leftRenderer)
             {
                 leftRenderer->setColor(color);
@@ -896,7 +892,7 @@ void RichText::handleTextRenderer(const std::string& text, const std::string& fo
     
 void RichText::handleImageRenderer(const std::string& filePath, const Color3B &color, GLubyte opacity, int width, int height)
 {
-    Sprite* imageRenderer = Sprite::create(filePath);
+    Sprite* imageRenderer = createImageRenderer(filePath);
     if (imageRenderer)
     {
         auto currentSize = imageRenderer->getContentSize();
