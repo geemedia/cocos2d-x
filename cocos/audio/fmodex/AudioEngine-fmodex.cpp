@@ -1,24 +1,16 @@
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) && CC_USE_ANDROID_FMOD
+#ifdef CC_USE_FMOD_EX
+#include "AudioEngine-fmodex.h"
 #include <cstring>
-#include "cocos2d.h"
-#include "fmod_errors.h"
-#include "AudioEngine-fmod.h"
-
 #include <unistd.h>
-// for native asset manager
-#include <sys/types.h>
-#include <android/asset_manager.h>
-#include <android/asset_manager_jni.h>
-
 #include <unordered_map>
-#include "platform/android/jni/JniHelper.h"
-#include <android/log.h>
-#include <jni.h>
+#include <fmod_errors.h>
 #include "audio/include/AudioEngine.h"
 #include "base/CCDirector.h"
 #include "base/CCScheduler.h"
-#include "platform/android/CCFileUtils-android.h"
+#include "platform/CCFileUtils.h"
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 #include "platform/android/jni/Java_org_cocos2dx_lib_Cocos2dxHelper.h"
+#endif
 
 using namespace cocos2d;
 using namespace cocos2d::experimental;
@@ -64,27 +56,41 @@ AudioEngineImpl::~AudioEngineImpl()
 {
     ERRCHECKWITHEXIT(_fmodSystem->close());
     ERRCHECKWITHEXIT(_fmodSystem->release());
-
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 	stopFmodJNI();
+#endif
 }
 
 bool AudioEngineImpl::init()
 {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 	startFmodJNI();
+#endif
+    bool success = false;
 
-    ERRCHECKWITHEXIT(FMOD::System_Create(&_fmodSystem));
-    ERRCHECK(_fmodSystem->setDSPBufferSize(_bufferLength, _numBuffers));
-    ERRCHECK(_fmodSystem->init(MAX_AUDIOINSTANCES, FMOD_INIT_NORMAL, 0));
+    do {
+        bool failed = ERRCHECK(FMOD::System_Create(&_fmodSystem));
+        CC_BREAK_IF(failed);
+        failed = ERRCHECK(_fmodSystem->setDSPBufferSize(_bufferLength, _numBuffers));
+        CC_BREAK_IF(failed);
+#if CC_TARGET_PLATFORM == CC_PLATFORM_LINUX
+        failed = ERRCHECK(_fmodSystem->setOutput(FMOD_OUTPUTTYPE_ALSA));
+        CC_BREAK_IF(failed);
+#endif
+        failed = ERRCHECK(_fmodSystem->init(MAX_AUDIOINSTANCES, FMOD_INIT_NORMAL, 0));
+        CC_BREAK_IF(failed);
 
-    _channelInfoMap.clear();
-    _soundMap.clear();
+        _channelInfoMap.clear();
+        _soundMap.clear();
 
-    auto scheduler = cocos2d::Director::getInstance()->getScheduler();
-    scheduler->schedule(schedule_selector(AudioEngineImpl::update), this, 0.05f, false);
+        auto scheduler = cocos2d::Director::getInstance()->getScheduler();
+        scheduler->schedule(schedule_selector(AudioEngineImpl::update), this, 0.05f, false);
 
-    g_AudioEngineImpl = this; 
+        g_AudioEngineImpl = this;
+        success = true;
+    } while (0); 
 
-    return true;
+    return success;
 }
 
 int AudioEngineImpl::play2d(const std::string &fileFullPath, bool loop, float volume)

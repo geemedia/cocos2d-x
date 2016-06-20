@@ -21,7 +21,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) && !CC_USE_ANDROID_FMOD
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 #include "audio/android/AudioEngine-inl.h"
 
 #include <unistd.h>

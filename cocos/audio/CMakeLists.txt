@@ -20,8 +20,8 @@ ELSEIF(ANDROID)
         audio/android/jni/cddandroidAndroidJavaEngine.cpp
     )
 
-    if(USE_ANDROID_FMOD)
-        list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/android/AudioEngine-fmod.cpp)
+    if(USE_FMOD_EX)
+        list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/fmodex/AudioEngine-fmodex.cpp)
     else()
         list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/android/AudioEngine-inl.cpp)
     endif()
@@ -29,9 +29,15 @@ ELSEIF(ANDROID)
 elseif(LINUX)
     set(COCOS_AUDIO_PLATFORM_SRC
         audio/linux/SimpleAudioEngine.cpp
-        audio/linux/AudioEngine-linux.h
-        audio/linux/AudioEngine-linux.cpp
     )
+    
+    if(USE_FMOD_EX)
+        list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/fmodex/AudioEngine-fmodex.h)
+        list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/fmodex/AudioEngine-fmodex.cpp)
+    else()
+        list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/linux/AudioEngine-linux.h)
+        list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/linux/AudioEngine-linux.cpp)
+    endif()
 
 elseif(MACOSX)
     # split it in _C and non C
