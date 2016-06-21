@@ -589,8 +589,9 @@ static Label* createTextRenderer(const std::string& text, const std::string& fon
         label = Label::createWithTTF(text, fontName, fontSize);
         if (!label)
             label = Label::createWithBMFont(fontName, text);
-    } else
-        label = Label::createWithSystemFont(text, fontName, fontSize);
+    } else {
+      label = Label::createWithSystemFont(text, fontName, fontSize);
+    }
     return label;
 }
 
