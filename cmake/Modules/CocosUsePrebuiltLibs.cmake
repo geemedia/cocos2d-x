@@ -90,7 +90,7 @@ if(LINUX)
   list(APPEND all_prebuilt_libs fmod)
 endif()
 
-if (ANDROID AND USE_ANDROID_FMOD)
+if (ANDROID AND USE_FMOD_EX)
   list(APPEND all_prebuilt_libs fmod)
 endif()
 

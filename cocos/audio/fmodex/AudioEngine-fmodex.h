@@ -1,9 +1,9 @@
 #include "platform/CCPlatformConfig.h"
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID) && CC_USE_ANDROID_FMOD
+#ifdef CC_USE_FMOD_EX
 
-#ifndef __AUDIO_ENGINE_ANDROID_H_
-#define __AUDIO_ENGINE_ANDROID_H_
+#ifndef __AUDIO_ENGINE_FMODEX_H_
+#define __AUDIO_ENGINE_FMODEX_H_
 
 #include <functional>
 #include <iostream>
@@ -12,11 +12,14 @@
 #include "audio/include/AudioEngine.h"
 #include "base/CCRef.h"
 
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 #define MAX_AUDIOINSTANCES 24
+#else
+#define MAX_AUDIOINSTANCES 32
+#endif
 
 NS_CC_BEGIN
 namespace experimental{
-class AudioEngineImpl;
 
 class CC_DLL AudioEngineImpl : public cocos2d::Ref
 {
@@ -74,5 +77,5 @@ private:
 };
 }
 NS_CC_END
-#endif // __AUDIO_ENGINE_ANDROID_H_
+#endif // __AUDIO_ENGINE_FMODEX_H_
 #endif
