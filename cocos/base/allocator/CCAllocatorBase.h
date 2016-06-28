@@ -28,6 +28,7 @@
 /// @cond DO_NOT_SHOW
 
 #include <string>
+#include <cstdlib>
 
 #include "platform/CCPlatformMacros.h"
 #include "base/allocator/CCAllocatorMacros.h"
