@@ -978,6 +978,7 @@ void Director::reset()
     SpriteFrameCache::destroyInstance();
     GLProgramCache::destroyInstance();
     GLProgramStateCache::destroyInstance();
+    destroyTextureCache();
     FileUtils::destroyInstance();
     AsyncTaskPool::destoryInstance();
     
@@ -987,8 +988,6 @@ void Director::reset()
     GL::invalidateStateCache();
 
     RenderState::finalize();
-    
-    destroyTextureCache();
 }
 
 void Director::purgeDirector()
