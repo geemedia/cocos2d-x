@@ -24,6 +24,7 @@
  ****************************************************************************/
 
 #include "CCPUScriptParser.h"
+#include <cstdio>
 
 NS_CC_BEGIN
 

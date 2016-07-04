@@ -36,6 +36,7 @@ typedef SSIZE_T ssize_t;
 #endif // __SSIZE_T
 
 #else
+#include <unistd.h>
 #include <sys/select.h>
 #endif
 

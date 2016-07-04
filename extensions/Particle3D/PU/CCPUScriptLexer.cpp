@@ -24,7 +24,7 @@
  ****************************************************************************/
 
 #include "CCPUScriptLexer.h"
-
+#include <cstdio>
 
 NS_CC_BEGIN
 PUScriptLexer::PUScriptLexer()
