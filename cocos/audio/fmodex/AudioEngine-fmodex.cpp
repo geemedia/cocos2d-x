@@ -48,7 +48,8 @@ AudioEngineImpl::AudioEngineImpl()
 : _fmodSystem(nullptr),
   _bufferLength(1024),
   _numBuffers(4),
-  _lazyInitLoop(true)
+  _lazyInitLoop(true),
+  _currentAudioID(0)
 {
 }
 
@@ -121,7 +122,6 @@ int AudioEngineImpl::play2d(const std::string &fileFullPath, bool loop, float vo
 
 int AudioEngineImpl::preload(const std::string& filePath, std::function<void(bool isSuccess)> callback)
 {
-    int audioID = AudioEngine::INVALID_AUDIO_ID;
     FMOD::Sound* sound = findSound(filePath);
     if (sound == nullptr) {
         Data soundData = FileUtils::getInstance()->getDataFromFile(filePath);
@@ -139,30 +139,24 @@ int AudioEngineImpl::preload(const std::string& filePath, std::function<void(boo
             return AudioEngine::INVALID_AUDIO_ID;
         }
         _soundMap[filePath] = sound;
-
-        audioID = _channelInfoMap.size() + 1;
-        auto& chanelInfo = _channelInfoMap[audioID];
-        chanelInfo.sound = sound;
-        chanelInfo.id = static_cast<size_t>(audioID);
-        chanelInfo.channel = nullptr;
-        chanelInfo.callback = nullptr;
-        chanelInfo.path = filePath;
-        chanelInfo.sound->setUserData((void*)audioID);
-        
-        if (callback) {
-            callback(true);
-        }
     }
-    else {
-        void* data;
-        sound->getUserData(&data);
-        audioID = reinterpret_cast<int>(data);
+
+    int audioID = _currentAudioID++;
+    auto& chanelInfo = _channelInfoMap[audioID];
+    chanelInfo.sound = sound;
+    chanelInfo.id = static_cast<size_t>(audioID);
+    chanelInfo.channel = nullptr;
+    chanelInfo.callback = nullptr;
+    chanelInfo.path = filePath;
+        
+    if (callback) {
+        callback(true);
     }
 
     return audioID;
 }
 
-void AudioEngineImpl::setVolume(int audioID,float volume)
+void AudioEngineImpl::setVolume(int audioID, float volume)
 {
     if (_channelInfoMap.find(audioID) != _channelInfoMap.end()) {
         ERRCHECK(_channelInfoMap[audioID].channel->setVolume(volume));
@@ -225,9 +219,10 @@ bool AudioEngineImpl::resume(int audioID)
 
 bool AudioEngineImpl::stop(int audioID)
 {
-    if (_channelInfoMap.find(audioID) != _channelInfoMap.end()) {
-        _channelInfoMap[audioID].channel->stop();
-        _channelInfoMap[audioID].channel = nullptr;
+    auto it = _channelInfoMap.find(audioID);
+    if (it != _channelInfoMap.end()) {
+        it->second.channel->stop();
+        it->second.channel = nullptr;
         return true;
     }
     else {      
@@ -238,9 +233,8 @@ bool AudioEngineImpl::stop(int audioID)
 
 void AudioEngineImpl::stopAll(){
     for (auto it = _channelInfoMap.begin(); it != _channelInfoMap.end(); ++it) {
-        ChannelInfo& audioRef = it->second;
-        audioRef.channel->stop();
-        audioRef.channel = nullptr;
+        it->second.channel->stop();
+        it->second.channel = nullptr;
     }
 }
 
@@ -298,22 +292,24 @@ void AudioEngineImpl::setFinishCallback(int audioID, const std::function<void(in
 void AudioEngineImpl::onSoundFinished(FMOD::Channel* channel)
 {
     if (channel != nullptr) {
-        size_t audioID;
         void* data;
         channel->getUserData(&data);
-        audioID = reinterpret_cast<size_t>(data);
+        auto audioID = reinterpret_cast<int>(data);
         auto it = _channelInfoMap.find(audioID);
         if (it != _channelInfoMap.end()) {
-            if (_channelInfoMap[audioID].callback) {
-                std::string path = _channelInfoMap[audioID].path;
-                _channelInfoMap[audioID].callback(audioID, path);
+            ChannelInfo& audioRef = it->second;
+
+            if (audioRef.callback) {
+                audioRef.callback(audioID, audioRef.path);
             }
 
-            ChannelInfo& audioRef = it->second;
-            _channelInfoMap[audioID].channel->stop();
-            _channelInfoMap[audioID].channel = nullptr;
-            _channelInfoMap[audioID].callback = nullptr;
-            AudioEngine::remove(audioID);
+            if (audioRef.channel != nullptr) {
+                audioRef.channel->stop();
+            }
+
+            audioRef.channel = nullptr;
+            audioRef.callback = nullptr;
+            _finishedAudioIDs.insert(audioID);
         } else {
             CCLOG("AudioEngineImpl::onSoundFinished: invalid audioID: %d\n", audioID);
         }
@@ -329,11 +325,7 @@ void AudioEngineImpl::uncache(const std::string& path)
     if (it != _soundMap.end()) {
         FMOD::Sound* sound = it->second;
         if (sound) {
-            void* data;
-            sound->getUserData(&data);
-            int audioID = reinterpret_cast<int>(data);
             sound->release();
-            _channelInfoMap.erase(audioID);
             _soundMap.erase(it);
         }
     }
@@ -348,12 +340,17 @@ void AudioEngineImpl::uncacheAll()
         }
     }
     _soundMap.clear();
-    _channelInfoMap.clear();
 }
 
 void AudioEngineImpl::update(float dt)
 {
     _fmodSystem->update();
+
+    for(auto audioID : _finishedAudioIDs) {
+        AudioEngine::remove(audioID);
+        _channelInfoMap.erase(audioID);
+    }
+    _finishedAudioIDs.clear();
 
     if (_channelInfoMap.empty()) {
         _lazyInitLoop = true;
@@ -369,13 +366,4 @@ FMOD::Sound* AudioEngineImpl::findSound(const std::string &path)
     return (it!=_soundMap.end())?(it->second):nullptr; 
 }
 
-
-FMOD::Channel* AudioEngineImpl::getChannel(FMOD::Sound* sound)
-{
-    size_t audioID;
-    void* data;
-    sound->getUserData(&data);
-    audioID = reinterpret_cast<size_t>(data);
-    return _channelInfoMap[audioID].channel;
-}
 #endif

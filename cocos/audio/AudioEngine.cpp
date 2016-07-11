@@ -369,9 +369,11 @@ void AudioEngine::uncache(const std::string &filePath)
 {
     if(_audioPathIDMap.find(filePath) != _audioPathIDMap.end()){
         auto itEnd = _audioPathIDMap[filePath].end();
-        for (auto it = _audioPathIDMap[filePath].begin() ; it != itEnd; ++it) {
+        for (auto it = _audioPathIDMap[filePath].begin(); it != itEnd; ++it) {
             auto audioID = *it;
-            _audioEngineImpl->stop(audioID);
+            if (_audioEngineImpl) {
+              _audioEngineImpl->stop(audioID);
+            }
             
             auto itInfo = _audioIDInfoMap.find(audioID);
             if (itInfo != _audioIDInfoMap.end()){

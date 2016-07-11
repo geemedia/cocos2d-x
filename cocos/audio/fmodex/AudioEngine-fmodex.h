@@ -8,6 +8,7 @@
 #include <functional>
 #include <iostream>
 #include <map>
+#include <set>
 #include <fmod.hpp>
 #include "audio/include/AudioEngine.h"
 #include "base/CCRef.h"
@@ -52,8 +53,6 @@ public:
 private:
     // returns null if a sound with the given path is not found
     FMOD::Sound* findSound(const std::string &path);
-  
-    FMOD::Channel* getChannel(FMOD::Sound*);
 
     struct ChannelInfo{
         size_t id; 
@@ -74,6 +73,8 @@ private:
     unsigned int _bufferLength;
     int _numBuffers;
     bool _lazyInitLoop;
+    int _currentAudioID;
+    std::set<int> _finishedAudioIDs;
 };
 }
 NS_CC_END
