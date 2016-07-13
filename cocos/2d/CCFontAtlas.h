@@ -82,7 +82,8 @@ public:
     void  addTexture(Texture2D *texture, int slot);
     float getLineHeight() const { return _lineHeight; }
     void  setLineHeight(float newHeight);
-    int   getAscender() const { return _fontAscender; }
+    float getAscender() const { return _fontAscender; }
+    void  setAscender(float newAscender);
     
     Texture2D* getTexture(int slot);
     const Font* getFont() const { return _font; }
@@ -141,7 +142,7 @@ protected:
     int _letterPadding;
     int _letterEdgeExtend;
 
-    int _fontAscender;
+    float _fontAscender;
     EventListenerCustom* _rendererRecreatedListener;
     bool _antialiasEnabled;
     int _currLineHeight;

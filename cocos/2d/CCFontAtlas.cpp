@@ -448,6 +448,11 @@ void  FontAtlas::setLineHeight(float newHeight)
     _lineHeight = newHeight;
 }
 
+void  FontAtlas::setAscender(float newAscender)
+{
+    _fontAscender = newAscender;
+}
+
 void FontAtlas::setAliasTexParameters()
 {
     if (_antialiasEnabled)

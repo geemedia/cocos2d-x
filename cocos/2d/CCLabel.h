@@ -598,7 +598,7 @@ public:
     CC_DEPRECATED_ATTRIBUTE FontDefinition getFontDefinition() const { return _getFontDefinition(); }
     CC_DEPRECATED_ATTRIBUTE int getCommonLineHeight() const { return (int)getLineHeight();}
 
-    int getFontAscent() const { return _fontAscent; }
+    float getFontAscent() const { return _fontAscent; }
 
 CC_CONSTRUCTOR_ACCESS:
     /**
@@ -780,7 +780,7 @@ protected:
     DrawNode* _underlineNode;
     bool _strikethroughEnabled;
 
-    int _fontAscent;
+    float _fontAscent;
 
 private:
     CC_DISALLOW_COPY_AND_ASSIGN(Label);
