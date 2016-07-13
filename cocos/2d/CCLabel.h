@@ -598,6 +598,8 @@ public:
     CC_DEPRECATED_ATTRIBUTE FontDefinition getFontDefinition() const { return _getFontDefinition(); }
     CC_DEPRECATED_ATTRIBUTE int getCommonLineHeight() const { return (int)getLineHeight();}
 
+    int getFontAscent() const { return _fontAscent; }
+
 CC_CONSTRUCTOR_ACCESS:
     /**
      * Constructor of Label.
@@ -777,6 +779,8 @@ protected:
     bool _boldEnabled;
     DrawNode* _underlineNode;
     bool _strikethroughEnabled;
+
+    int _fontAscent;
 
 private:
     CC_DISALLOW_COPY_AND_ASSIGN(Label);

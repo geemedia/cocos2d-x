@@ -387,6 +387,7 @@ Label::Label(TextHAlignment hAlignment /* = TextHAlignment::LEFT */,
 , _boldEnabled(false)
 , _underlineNode(nullptr)
 , _strikethroughEnabled(false)
+, _fontAscent(0)
 {
     setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     reset();
@@ -523,6 +524,7 @@ void Label::reset()
         _underlineNode = nullptr;
     }
     _strikethroughEnabled = false;
+    _fontAscent = 0;
     setRotationSkewX(0);        // reverse italics
 }
 
@@ -586,6 +588,7 @@ void Label::setFontAtlas(FontAtlas* atlas,bool distanceFieldEnabled /* = false *
     if (_fontAtlas)
     {
         _lineHeight = _fontAtlas->getLineHeight();
+        _fontAscent = _fontAtlas->getAscender();
         _contentDirty = true;
         _systemFontDirty = false;
     }
@@ -780,9 +783,9 @@ bool Label::alignText()
     do {
         _fontAtlas->prepareLetterDefinitions(_utf16Text);
         auto& textures = _fontAtlas->getTextures();
-        if (textures.size() > _batchNodes.size())
+        if (static_cast<ssize_t>(textures.size()) > _batchNodes.size())
         {
-            for (auto index = _batchNodes.size(); index < textures.size(); ++index)
+            for (auto index = _batchNodes.size(); index < static_cast<ssize_t>(textures.size()); ++index)
             {
                 auto batchNode = SpriteBatchNode::createWithTexture(textures.at(index));
                 if (batchNode)
@@ -1129,7 +1132,7 @@ void Label::enableBold()
     if (!_boldEnabled)
     {
         // bold is implemented with outline
-        enableShadow(Color4B::WHITE, Size(0.9,0), 0);
+        enableShadow(Color4B::WHITE, Size(0.9f,0), 0);
         // add one to kerning
         setAdditionalKerning(_additionalKerning+1);
         _boldEnabled = true;

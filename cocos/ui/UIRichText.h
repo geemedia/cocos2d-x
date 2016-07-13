@@ -406,7 +406,7 @@ protected:
     void handleTextRenderer(const std::string& text, const std::string& fontName, float fontSize, const Color3B& color, GLubyte opacity, uint32_t flags, const std::string& url="");
     void handleImageRenderer(const std::string& fileParh, const Color3B& color, GLubyte opacity, int width, int height);
     void handleCustomRenderer(Node* renderer);
-    void formarRenderers();
+    void formatRenderers();
     void addNewLine();
     int findSplitPositionForWord(cocos2d::Label* label, const std::string& text);
     int findSplitPositionForChar(cocos2d::Label* label, const std::string& text);

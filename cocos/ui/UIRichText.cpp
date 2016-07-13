@@ -710,7 +710,7 @@ void RichText::formatText()
                 }
             }
         }
-        formarRenderers();
+        formatRenderers();
         _formatTextDirty = false;
     }
 }
@@ -930,27 +930,48 @@ void RichText::addNewLine()
     _elementRenders.push_back(new Vector<Node*>());
 }
     
-void RichText::formarRenderers()
+void RichText::formatRenderers()
 {
     if (_ignoreSize)
     {
         float newContentSizeWidth = 0.0f;
         float nextPosY = 0.0f;
-        for (auto& element: _elementRenders)
+        for (auto row : _elementRenders)
         {
-            Vector<Node*>* row = element;
+            float maxBaseline = 0;
+            auto itEnd = row->end();
+            for (auto it = row->begin(); it != itEnd; ++it)
+            {
+                Label* label = dynamic_cast<Label*>(*it);
+                if (label)
+                {
+                    float ascent = std::abs(label->getFontAscent() / CC_CONTENT_SCALE_FACTOR());
+                    maxBaseline = std::max(maxBaseline, label->getContentSize().height - ascent);
+                }
+            }
+
             float nextPosX = 0.0f;
             float maxY = 0.0f;
-            for (ssize_t j=0; j<row->size(); j++)
+            for (auto it = row->begin(); it != itEnd; ++it)
             {
-                Node* l = row->at(j);
-                l->setAnchorPoint(Vec2::ZERO);
-                l->setPosition(nextPosX, nextPosY);
-                this->addProtectedChild(l, 1);
-                Size iSize = l->getContentSize();
+                auto node = *it;
+                Size iSize = node->getContentSize();
+                float height = iSize.height;
+                float baseline = 0;
+                auto label = dynamic_cast<Label*>(node);
+                if (label)
+                {
+                    float labelAscent = std::abs(label->getFontAscent()) / CC_CONTENT_SCALE_FACTOR();
+                    baseline = height - labelAscent;
+                }
+                float baselineDiff = maxBaseline - baseline;
+                node->setAnchorPoint(Vec2::ZERO);
+                node->setPosition(nextPosX, nextPosY + baselineDiff);
+                this->addProtectedChild(node, 1);
                 newContentSizeWidth += iSize.width;
+
                 nextPosX += iSize.width;
-                maxY = MAX(maxY, iSize.height);
+                maxY = std::max(maxY, std::ceil(height + baselineDiff));
             }
             nextPosY -= maxY;
         }
@@ -959,47 +980,78 @@ void RichText::formarRenderers()
     else
     {
         float newContentSizeHeight = 0.0f;
-        float *maxHeights = new (std::nothrow) float[_elementRenders.size()];
+        std::vector<float> maxHeights(_elementRenders.size());
+        std::vector<float> maxBaselines(_elementRenders.size());
         
-        for (size_t i=0; i<_elementRenders.size(); i++)
+        for (size_t rowIdx = 0; rowIdx < _elementRenders.size(); ++rowIdx)
         {
-            Vector<Node*>* row = (_elementRenders[i]);
-            float maxHeight = 0.0f;
-            for (ssize_t j=0; j<row->size(); j++)
+            Vector<Node*>* row = _elementRenders[rowIdx];
+
+            float maxBaseline = 0;
+            auto itEnd = row->end();
+            for (auto it = row->begin(); it != itEnd; ++it)
             {
-                Node* l = row->at(j);
-                maxHeight = MAX(l->getContentSize().height, maxHeight);
+                Label* label = dynamic_cast<Label*>(*it);
+                if (label)
+                {
+                    float ascent = std::abs(label->getFontAscent() / CC_CONTENT_SCALE_FACTOR());
+                    maxBaseline = std::max(maxBaseline, label->getContentSize().height - ascent);
+                }
             }
-            maxHeights[i] = maxHeight;
-            newContentSizeHeight += maxHeights[i];
+            maxBaselines[rowIdx] = maxBaseline;
+
+            float maxHeight = 0.0f;
+            for (auto it = row->begin(); it != itEnd; ++it)
+            {
+                auto node = *it;
+                float baseline = 0;
+                float height = node->getContentSize().height;
+                auto label = dynamic_cast<Label*>(node);
+                if (label)
+                {
+                    float ascent = std::abs(label->getFontAscent() / CC_CONTENT_SCALE_FACTOR());
+                    baseline = height - ascent;
+                }
+                float baselineDiff = maxBaseline - baseline;
+                maxHeight = std::max(std::ceil(height + baselineDiff), maxHeight);
+            }
+            maxHeights[rowIdx] = maxHeight;
+            newContentSizeHeight += maxHeights[rowIdx];
         }
         
         float nextPosY = _customSize.height;
-        for (size_t i=0; i<_elementRenders.size(); i++)
+        for (size_t rowIdx =0; rowIdx < _elementRenders.size(); ++rowIdx)
         {
-            Vector<Node*>* row = (_elementRenders[i]);
+            Vector<Node*>* row = _elementRenders[rowIdx];
             float nextPosX = 0.0f;
-            nextPosY -= (maxHeights[i] + _verticalSpace);
-            
-            for (ssize_t j=0; j<row->size(); j++)
+            nextPosY -= (maxHeights[rowIdx] + _verticalSpace);
+
+            auto itEnd = row->end();
+            for (auto it = row->begin(); it != itEnd; ++it)
             {
-                Node* l = row->at(j);
-                l->setAnchorPoint(Vec2::ZERO);
-                l->setPosition(nextPosX, nextPosY);
-                this->addProtectedChild(l, 1);
-                nextPosX += l->getContentSize().width;
+                auto node = *it;
+                float baseline = 0;
+                auto label = dynamic_cast<Label*>(node);
+                if (label)
+                {
+                    float ascent = std::abs(label->getFontAscent() / CC_CONTENT_SCALE_FACTOR());
+                    baseline = node->getContentSize().height - ascent;
+                }
+                float baselineDiff = maxBaselines[rowIdx] - baseline;
+                node->setAnchorPoint(Vec2::ZERO);
+                node->setPosition(nextPosX, nextPosY + baselineDiff);
+                this->addProtectedChild(node, 1);
+
+                nextPosX += node->getContentSize().width;
             }
         }
-        delete [] maxHeights;
     }
     
-    size_t length = _elementRenders.size();
-    for (size_t i = 0; i<length; i++)
-	{
-        Vector<Node*>* l = _elementRenders[i];
-        l->clear();
-        delete l;
-	}    
+    for (auto row : _elementRenders)
+    {
+        row->clear();
+        delete row;
+    }    
     _elementRenders.clear();
     
     if (_ignoreSize)
@@ -1013,7 +1065,7 @@ void RichText::formarRenderers()
     }
     updateContentSizeWithTextureSize(_contentSize);
 }
-    
+
 void RichText::adaptRenderers()
 {
     this->formatText();

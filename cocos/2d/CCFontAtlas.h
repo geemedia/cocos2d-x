@@ -82,6 +82,7 @@ public:
     void  addTexture(Texture2D *texture, int slot);
     float getLineHeight() const { return _lineHeight; }
     void  setLineHeight(float newHeight);
+    int   getAscender() const { return _fontAscender; }
     
     Texture2D* getTexture(int slot);
     const Font* getFont() const { return _font; }
