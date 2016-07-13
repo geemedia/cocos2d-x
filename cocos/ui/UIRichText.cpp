@@ -991,11 +991,12 @@ void RichText::formatRenderers()
             auto itEnd = row->end();
             for (auto it = row->begin(); it != itEnd; ++it)
             {
+                float height = (*it)->getContentSize().height;
                 Label* label = dynamic_cast<Label*>(*it);
                 if (label)
                 {
                     float ascent = std::abs(label->getFontAscent() / CC_CONTENT_SCALE_FACTOR());
-                    maxBaseline = std::max(maxBaseline, label->getContentSize().height - ascent);
+                    maxBaseline = std::max(maxBaseline, height - ascent);
                 }
             }
             maxBaselines[rowIdx] = maxBaseline;
