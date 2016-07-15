@@ -311,6 +311,12 @@ public:
         WRAP_PER_WORD,
         WRAP_PER_CHAR
     };
+
+    enum class AlignElementsOnBaseline {
+      NONE,
+      TEXT,
+      ALL
+    };
     
     /**
      * @brief Default constructor.
@@ -392,6 +398,8 @@ public:
 
     /** @brief returns the current wrapping mode */
     WrapMode getWrapMode() const;
+
+    void setAlignOnBaseline(AlignElementsOnBaseline alignOnBaseline);
     
 CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
@@ -419,6 +427,8 @@ protected:
 
     // per word, or per char
     WrapMode _wrapMode;
+
+    AlignElementsOnBaseline _alignOnBaseline;
 };
     
 }

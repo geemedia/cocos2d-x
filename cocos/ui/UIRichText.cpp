@@ -196,6 +196,7 @@ RichText::RichText()
     , _leftSpaceWidth(0.0f)
     , _verticalSpace(0.0f)
     , _wrapMode(WRAP_PER_WORD)
+    , _alignOnBaseline(AlignElementsOnBaseline::ALL)
 {
 }
     
@@ -582,6 +583,11 @@ void RichText::setWrapMode(RichText::WrapMode wrapMode)
     }
 }
 
+void RichText::setAlignOnBaseline(AlignElementsOnBaseline alignOnBaseline)
+{
+    _alignOnBaseline = alignOnBaseline;
+}
+
 static Label* createTextRenderer(const std::string& text, const std::string& fontName, float fontSize)
 {
     Label* label;
@@ -938,15 +944,19 @@ void RichText::formatRenderers()
         float nextPosY = 0.0f;
         for (auto row : _elementRenders)
         {
-            float maxBaseline = 0;
             auto itEnd = row->end();
-            for (auto it = row->begin(); it != itEnd; ++it)
+            float maxBaseline = 0;
+            
+            if (_alignOnBaseline != AlignElementsOnBaseline::NONE)
             {
-                Label* label = dynamic_cast<Label*>(*it);
-                if (label)
+                for (auto it = row->begin(); it != itEnd; ++it)
                 {
-                    float ascent = std::abs(label->getFontAscent() / CC_CONTENT_SCALE_FACTOR());
-                    maxBaseline = std::max(maxBaseline, label->getContentSize().height - ascent);
+                    Label* label = dynamic_cast<Label*>(*it);
+                    if (label)
+                    {
+                        float ascent = std::abs(label->getFontAscent() / CC_CONTENT_SCALE_FACTOR());
+                        maxBaseline = std::max(maxBaseline, label->getContentSize().height - ascent);
+                    }
                 }
             }
 
@@ -957,14 +967,24 @@ void RichText::formatRenderers()
                 auto node = *it;
                 Size iSize = node->getContentSize();
                 float height = iSize.height;
-                float baseline = 0;
-                auto label = dynamic_cast<Label*>(node);
-                if (label)
+                float baselineDiff = 0;
+
+                if (_alignOnBaseline != AlignElementsOnBaseline::NONE)
                 {
-                    float labelAscent = std::abs(label->getFontAscent()) / CC_CONTENT_SCALE_FACTOR();
-                    baseline = height - labelAscent;
+                    float baseline = 0;
+                    auto label = dynamic_cast<Label*>(node);
+                    if (label)
+                    {
+                        float labelAscent = std::abs(label->getFontAscent()) / CC_CONTENT_SCALE_FACTOR();
+                        baseline = height - labelAscent;
+                    }
+                    else if (_alignOnBaseline == AlignElementsOnBaseline::TEXT)
+                    {
+                        baseline = maxBaseline;
+                    }
+                    baselineDiff = maxBaseline - baseline;
                 }
-                float baselineDiff = maxBaseline - baseline;
+
                 node->setAnchorPoint(Vec2::ZERO);
                 node->setPosition(nextPosX, nextPosY + baselineDiff);
                 this->addProtectedChild(node, 1);
@@ -987,19 +1007,27 @@ void RichText::formatRenderers()
         {
             Vector<Node*>* row = _elementRenders[rowIdx];
 
-            float maxBaseline = 0;
             auto itEnd = row->end();
-            for (auto it = row->begin(); it != itEnd; ++it)
+            float maxBaseline = 0;
+
+            if (_alignOnBaseline != AlignElementsOnBaseline::NONE)
             {
-                float height = (*it)->getContentSize().height;
-                Label* label = dynamic_cast<Label*>(*it);
-                if (label)
+                for (auto it = row->begin(); it != itEnd; ++it)
                 {
-                    float ascent = std::abs(label->getFontAscent() / CC_CONTENT_SCALE_FACTOR());
-                    maxBaseline = std::max(maxBaseline, height - ascent);
+                    float height = (*it)->getContentSize().height;
+                    Label* label = dynamic_cast<Label*>(*it);
+                    if (label)
+                    {
+                        float ascent = std::abs(label->getFontAscent() / CC_CONTENT_SCALE_FACTOR());
+                        maxBaseline = std::max(maxBaseline, height - ascent);
+                    }
                 }
+                maxBaselines[rowIdx] = maxBaseline;
             }
-            maxBaselines[rowIdx] = maxBaseline;
+            else
+            {
+                maxBaselines[rowIdx] = 0;
+            }
 
             float maxHeight = 0.0f;
             for (auto it = row->begin(); it != itEnd; ++it)
@@ -1007,13 +1035,23 @@ void RichText::formatRenderers()
                 auto node = *it;
                 float baseline = 0;
                 float height = node->getContentSize().height;
-                auto label = dynamic_cast<Label*>(node);
-                if (label)
+                float baselineDiff = 0;
+
+                if (_alignOnBaseline != AlignElementsOnBaseline::NONE)
                 {
-                    float ascent = std::abs(label->getFontAscent() / CC_CONTENT_SCALE_FACTOR());
-                    baseline = height - ascent;
+                    auto label = dynamic_cast<Label*>(node);
+                    if (label)
+                    {
+                        float ascent = std::abs(label->getFontAscent() / CC_CONTENT_SCALE_FACTOR());
+                        baseline = height - ascent;
+                    }
+                    else if (_alignOnBaseline == AlignElementsOnBaseline::TEXT)
+                    {
+                        baseline = maxBaseline;
+                    }
+                    baselineDiff = maxBaseline - baseline;
                 }
-                float baselineDiff = maxBaseline - baseline;
+
                 maxHeight = std::max(std::ceil(height + baselineDiff), maxHeight);
             }
             maxHeights[rowIdx] = maxHeight;
@@ -1021,7 +1059,7 @@ void RichText::formatRenderers()
         }
         
         float nextPosY = _customSize.height;
-        for (size_t rowIdx =0; rowIdx < _elementRenders.size(); ++rowIdx)
+        for (size_t rowIdx = 0; rowIdx < _elementRenders.size(); ++rowIdx)
         {
             Vector<Node*>* row = _elementRenders[rowIdx];
             float nextPosX = 0.0f;
@@ -1031,14 +1069,24 @@ void RichText::formatRenderers()
             for (auto it = row->begin(); it != itEnd; ++it)
             {
                 auto node = *it;
-                float baseline = 0;
-                auto label = dynamic_cast<Label*>(node);
-                if (label)
+                float baselineDiff = 0;
+
+                if (_alignOnBaseline != AlignElementsOnBaseline::NONE)
                 {
-                    float ascent = std::abs(label->getFontAscent() / CC_CONTENT_SCALE_FACTOR());
-                    baseline = node->getContentSize().height - ascent;
+                    float baseline = 0;
+                    auto label = dynamic_cast<Label*>(node);
+                    if (label)
+                    {
+                        float ascent = std::abs(label->getFontAscent() / CC_CONTENT_SCALE_FACTOR());
+                        baseline = node->getContentSize().height - ascent;
+                    }
+                    else if (_alignOnBaseline == AlignElementsOnBaseline::TEXT)
+                    {
+                        baseline = maxBaselines[rowIdx];
+                    }
+                    baselineDiff = maxBaselines[rowIdx] - baseline;
                 }
-                float baselineDiff = maxBaselines[rowIdx] - baseline;
+
                 node->setAnchorPoint(Vec2::ZERO);
                 node->setPosition(nextPosX, nextPosY + baselineDiff);
                 this->addProtectedChild(node, 1);
