@@ -35,6 +35,10 @@ THE SOFTWARE.
 #include "base/CCValue.h"
 #include "base/CCData.h"
 
+#ifdef Status
+#undef Status  // Xlib.h defines Status as a macro to int
+#endif
+
 NS_CC_BEGIN
 
 /**
