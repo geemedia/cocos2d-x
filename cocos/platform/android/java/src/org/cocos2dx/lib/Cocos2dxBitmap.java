@@ -74,7 +74,7 @@ public final class Cocos2dxBitmap {
     // ===========================================================
 
     private static native void nativeInitBitmapDC(final int width,
-            final int height, final byte[] pixels);
+            final int height, final float fontAscent, final byte[] pixels);
 
     public static boolean createTextBitmapShadowStroke(byte[] bytes,  final String fontName, int fontSize,
                                                     int fontTintR, int fontTintG, int fontTintB, int fontTintA,
@@ -159,7 +159,7 @@ public final class Cocos2dxBitmap {
         paint.setARGB(fontTintA, fontTintR, fontTintG, fontTintB);
         staticLayout.draw(canvas);
 
-        Cocos2dxBitmap.initNativeObject(bitmap);
+        Cocos2dxBitmap.initNativeObject(bitmap, paint.getFontMetrics().ascent);
         return true;
     }
 
@@ -188,14 +188,14 @@ public final class Cocos2dxBitmap {
         return paint;
     }
 
-    private static void initNativeObject(final Bitmap bitmap) {
+    private static void initNativeObject(final Bitmap bitmap, final float fontAscent) {
         final byte[] pixels = Cocos2dxBitmap.getPixels(bitmap);
         if (pixels == null) {
             return;
         }
 
         Cocos2dxBitmap.nativeInitBitmapDC(bitmap.getWidth(),
-                bitmap.getHeight(), pixels);
+                bitmap.getHeight(), fontAscent, pixels);
     }
 
     private static byte[] getPixels(final Bitmap bitmap) {
