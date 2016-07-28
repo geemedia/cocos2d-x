@@ -181,9 +181,7 @@ public:
     }
 
     bool divideString(FT_Face face, const char* sText, int iMaxWidth, int iMaxHeight) {
-CCLOG("BEGIN divideString {");
         const char* pText = sText;
-        const char* pStart = sText;
         textLines.clear();
         iMaxLineWidth = 0;
 
@@ -237,19 +235,14 @@ CCLOG("BEGIN divideString {");
                 prevGlyphIndex = glyphIndex;
                 prevCharacter = unicode;
                 lastBreakIndex = currentLine.glyphs.size();
-CCLOG("firstBreakIndex = %d", firstBreakIndex);
-                if (firstBreakIndex == -1) {
+
+                if (firstBreakIndex == -1)
                     firstBreakIndex = lastBreakIndex;
-CCLOG("firstBreakIndex = %d", firstBreakIndex);
-				}
             } else {
                 if (iswspace(prevCharacter))
                     lastBreakIndex = currentLine.glyphs.size();
 
                 if (iMaxWidth > 0 && currentPaintPosition + glyph.bearingX + glyph.kerning + glyph.glyphWidth > iMaxWidth) {
-CCLOG("text = \"%s\", firstBreakIndex = %d, lastBreakIndex = %d", pStart, firstBreakIndex, lastBreakIndex);
-pStart += lastBreakIndex;
-
                     int glyphCount = currentLine.glyphs.size();
                     if ( lastBreakIndex >= 0 && lastBreakIndex < glyphCount && currentPaintPosition + glyph.bearingX + glyph.kerning + glyph.glyphWidth - currentLine.glyphs.at(lastBreakIndex).paintPosition < iMaxWidth ) {
                         // we insert a line break at our last break opportunity
@@ -311,7 +304,6 @@ pStart += lastBreakIndex;
             iMaxLineWidth = max(iMaxLineWidth, currentLine.lineWidth);
             textLines.push_back(currentLine);
         }
-CCLOG("} END divideString");
         return true;
     }
 
@@ -331,11 +323,7 @@ CCLOG("} END divideString");
     }
 
     int computeLineStartY( FT_Face face, Device::TextAlign eAlignMask, int txtHeight, int borderHeight ){
-#if 1
         int baseLinePos = ceilf(face->size->metrics.ascender/64.0f);
-#else
-        int baseLinePos = ceilf(FT_MulFix( face->bbox.yMax, face->size->metrics.y_scale )/64.0f);
-#endif
         if (eAlignMask == Device::TextAlign::CENTER || eAlignMask == Device::TextAlign::LEFT || eAlignMask == Device::TextAlign::RIGHT) {
             //vertical center
             return (borderHeight - txtHeight) / 2 + baseLinePos;
@@ -400,7 +388,6 @@ CCLOG("} END divideString");
             return false;
         }
 
-CCLOG("BEGIN getBitmap {");
         FT_Face face;
         std::string fontfile = getFontFile(textDefinition._fontName.c_str());
         if ( FT_New_Face(library, fontfile.c_str(), 0, &face) ) {
@@ -430,18 +417,9 @@ CCLOG("BEGIN getBitmap {");
         iMaxLineWidth = MAX(iMaxLineWidth, textDefinition._dimensions.width);
 
         //compute the final line height
-#if 1
         int lineHeight = face->size->metrics.height>>6;
-        iMaxLineHeight = (lineHeight * textLines.size());
-#else
-        iMaxLineHeight = ceilf(FT_MulFix( face->bbox.yMax - face->bbox.yMin, face->size->metrics.y_scale )/64.0f);
-        int lineHeight = face->size->metrics.height>>6;
-        if ( textLines.size() > 0 ) {
-            iMaxLineHeight += (lineHeight * (textLines.size() -1));
-        }
-#endif
-        int txtHeight = iMaxLineHeight;
-        iMaxLineHeight = MAX(iMaxLineHeight, textDefinition._dimensions.height);
+        int txtHeight = (lineHeight * textLines.size());
+        iMaxLineHeight = MAX(txtHeight, textDefinition._dimensions.height);
 
         _data = (unsigned char*)malloc(sizeof(unsigned char) * (iMaxLineWidth * iMaxLineHeight * 4));
         memset(_data,0, iMaxLineWidth * iMaxLineHeight*4);
@@ -498,7 +476,6 @@ CCLOG("BEGIN getBitmap {");
 
         //  free face
         FT_Done_Face(face);
-CCLOG("} END getBitmap");
         return true;
     }
 
