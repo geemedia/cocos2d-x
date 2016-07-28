@@ -860,7 +860,7 @@ void RichText::handleTextRenderer(const std::string& text, const std::string& fo
 //        if (0 == leftLength) leftLength = 1;
         std::string leftWords = Helper::getSubStringOfUTF8String(text, 0, leftLength);
         int rightStart = leftLength;
-        if (std::isspace(text[rightStart], std::locale()))
+        while (std::isspace(text[rightStart], std::locale()))
             rightStart++;
         std::string cutWords = Helper::getSubStringOfUTF8String(text, rightStart, text.length() - leftLength);
         if (leftLength > 0)
