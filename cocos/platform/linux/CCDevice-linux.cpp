@@ -71,7 +71,7 @@ struct LineBreakLine {
     void calculateWidth() {
         lineWidth = 0;
         if ( glyphs.empty() == false ) {
-            lineWidth = glyphs.at(glyphs.size() - 1).paintPosition + glyphs.at(glyphs.size() - 1).glyphWidth;
+            lineWidth = glyphs.at(glyphs.size() - 1).paintPosition + glyphs.at(glyphs.size() - 1).horizAdvance; //glyphWidth;
         }
     }
 };
@@ -180,7 +180,9 @@ public:
     }
 
     bool divideString(FT_Face face, const char* sText, int iMaxWidth, int iMaxHeight) {
+CCLOG("BEGIN divideString {");
         const char* pText = sText;
+        const char* pStart = sText;
         textLines.clear();
         iMaxLineWidth = 0;
 
@@ -192,6 +194,7 @@ public:
         LineBreakLine currentLine;
 
         int currentPaintPosition = 0;
+        int firstBreakIndex = -1;
         int lastBreakIndex = -1;
         bool hasKerning = FT_HAS_KERNING( face );
         while ((unicode=utf8((char**)&pText))) {
@@ -202,6 +205,7 @@ public:
                 currentLine.reset();
                 prevGlyphIndex = 0;
                 prevCharacter = 0;
+                firstBreakIndex = -1;
                 lastBreakIndex = -1;
                 currentPaintPosition = 0;
                 continue;
@@ -216,14 +220,6 @@ public:
                 return false;
             }
 
-            if (iswspace(unicode)) {
-                currentPaintPosition += face->glyph->metrics.horiAdvance >> 6;
-                prevGlyphIndex = glyphIndex;
-                prevCharacter = unicode;
-                lastBreakIndex = currentLine.glyphs.size();
-                continue;
-            }
-
             LineBreakGlyph glyph;
             glyph.glyphIndex = glyphIndex;
             glyph.glyphWidth = face->glyph->metrics.width >> 6;
@@ -236,48 +232,71 @@ public:
                 glyph.kerning = delta.x >> 6;
             }
 
-            if (iMaxWidth > 0 && currentPaintPosition + glyph.bearingX + glyph.kerning + glyph.glyphWidth > iMaxWidth) {
-
-                int glyphCount = currentLine.glyphs.size();
-                if ( lastBreakIndex >= 0 && lastBreakIndex < glyphCount && currentPaintPosition + glyph.bearingX + glyph.kerning + glyph.glyphWidth - currentLine.glyphs.at(lastBreakIndex).paintPosition < iMaxWidth ) {
-                    // we insert a line break at our last break opportunity
-                    std::vector<LineBreakGlyph> tempGlyphs;
-                    std::vector<LineBreakGlyph>::iterator it = currentLine.glyphs.begin();
-                    std::advance(it, lastBreakIndex);
-                    tempGlyphs.insert(tempGlyphs.begin(), it, currentLine.glyphs.end());
-                    currentLine.glyphs.erase(it, currentLine.glyphs.end());
-                    currentLine.calculateWidth();
-                    iMaxLineWidth = max(iMaxLineWidth, currentLine.lineWidth);
-                    textLines.push_back(currentLine);
-                    currentLine.reset();
-                    currentPaintPosition = 0;
-                    for ( it = tempGlyphs.begin(); it != tempGlyphs.end(); it++ ) {
-                        if ( currentLine.glyphs.empty() ) {
-                            currentPaintPosition = -(*it).bearingX;
-                            (*it).kerning = 0;
-                        }
-                        (*it).paintPosition = currentPaintPosition + (*it).bearingX + (*it).kerning;
-                        currentLine.glyphs.push_back((*it));
-                        currentPaintPosition += (*it).kerning + (*it).horizAdvance;
-                    }
-                } else {
-                    // the current word is too big to fit into one line, insert line break right here
-                    currentPaintPosition = 0;
-                    glyph.kerning = 0;
-                    currentLine.calculateWidth();
-                    iMaxLineWidth = max(iMaxLineWidth, currentLine.lineWidth);
-                    textLines.push_back(currentLine);
-                    currentLine.reset();
-                }
-
-                prevGlyphIndex = 0;
-                prevCharacter = 0;
-                lastBreakIndex = -1;
-            } else {
+            if (iswspace(unicode)) {
                 prevGlyphIndex = glyphIndex;
                 prevCharacter = unicode;
-            }
+                lastBreakIndex = currentLine.glyphs.size();
+CCLOG("firstBreakIndex = %d", firstBreakIndex);
+                if (firstBreakIndex == -1) {
+                    firstBreakIndex = lastBreakIndex;
+CCLOG("firstBreakIndex = %d", firstBreakIndex);
+				}
+            } else {
+                if (iswspace(prevCharacter))
+                    lastBreakIndex = currentLine.glyphs.size();
 
+                if (iMaxWidth > 0 && currentPaintPosition + glyph.bearingX + glyph.kerning + glyph.glyphWidth > iMaxWidth) {
+CCLOG("text = \"%s\", firstBreakIndex = %d, lastBreakIndex = %d", pStart, firstBreakIndex, lastBreakIndex);
+pStart += lastBreakIndex;
+
+                    int glyphCount = currentLine.glyphs.size();
+                    if ( lastBreakIndex >= 0 && lastBreakIndex < glyphCount && currentPaintPosition + glyph.bearingX + glyph.kerning + glyph.glyphWidth - currentLine.glyphs.at(lastBreakIndex).paintPosition < iMaxWidth ) {
+                        // we insert a line break at our last break opportunity
+                        std::vector<LineBreakGlyph> tempGlyphs;
+                        std::vector<LineBreakGlyph>::iterator it = currentLine.glyphs.begin();
+                        std::advance(it, lastBreakIndex);
+                        tempGlyphs.insert(tempGlyphs.begin(), it, currentLine.glyphs.end());
+                        if (firstBreakIndex == -1) {
+                            currentLine.glyphs.erase(it, currentLine.glyphs.end());
+                        } else {
+                            it = currentLine.glyphs.begin();
+                            std::advance(it, firstBreakIndex);
+                            currentLine.glyphs.erase(it, currentLine.glyphs.end());
+                        }
+                        currentLine.calculateWidth();
+                        iMaxLineWidth = max(iMaxLineWidth, currentLine.lineWidth);
+                        textLines.push_back(currentLine);
+                        currentLine.reset();
+                        currentPaintPosition = 0;
+                        for ( it = tempGlyphs.begin(); it != tempGlyphs.end(); it++ ) {
+                            if ( currentLine.glyphs.empty() ) {
+                                currentPaintPosition = -(*it).bearingX;
+                                (*it).kerning = 0;
+                            }
+                            (*it).paintPosition = currentPaintPosition + (*it).bearingX + (*it).kerning;
+                            currentLine.glyphs.push_back((*it));
+                            currentPaintPosition += (*it).kerning + (*it).horizAdvance;
+                        }
+                    } else {
+                        // the current word is too big to fit into one line, insert line break right here
+                        currentPaintPosition = 0;
+                        glyph.kerning = 0;
+                        currentLine.calculateWidth();
+                        iMaxLineWidth = max(iMaxLineWidth, currentLine.lineWidth);
+                        textLines.push_back(currentLine);
+                        currentLine.reset();
+                    }
+    
+                    prevGlyphIndex = 0;
+                    prevCharacter = 0;
+                    firstBreakIndex = -1;
+                    lastBreakIndex = -1;
+                } else {
+                    prevGlyphIndex = glyphIndex;
+                    prevCharacter = unicode;
+                }
+            }
+            
             if ( currentLine.glyphs.empty() ) {
                 currentPaintPosition = -glyph.bearingX;
             }
@@ -291,6 +310,7 @@ public:
             iMaxLineWidth = max(iMaxLineWidth, currentLine.lineWidth);
             textLines.push_back(currentLine);
         }
+CCLOG("} END divideString");
         return true;
     }
 
@@ -310,7 +330,11 @@ public:
     }
 
     int computeLineStartY( FT_Face face, Device::TextAlign eAlignMask, int txtHeight, int borderHeight ){
+#if 1
+        int baseLinePos = ceilf(face->size->metrics.ascender/64.0f);
+#else
         int baseLinePos = ceilf(FT_MulFix( face->bbox.yMax, face->size->metrics.y_scale )/64.0f);
+#endif
         if (eAlignMask == Device::TextAlign::CENTER || eAlignMask == Device::TextAlign::LEFT || eAlignMask == Device::TextAlign::RIGHT) {
             //vertical center
             return (borderHeight - txtHeight) / 2 + baseLinePos;
@@ -375,6 +399,7 @@ public:
             return false;
         }
 
+CCLOG("BEGIN getBitmap {");
         FT_Face face;
         std::string fontfile = getFontFile(textDefinition._fontName.c_str());
         if ( FT_New_Face(library, fontfile.c_str(), 0, &face) ) {
@@ -404,11 +429,16 @@ public:
         iMaxLineWidth = MAX(iMaxLineWidth, textDefinition._dimensions.width);
 
         //compute the final line height
+#if 1
+        int lineHeight = face->size->metrics.height>>6;
+        iMaxLineHeight = (lineHeight * textLines.size());
+#else
         iMaxLineHeight = ceilf(FT_MulFix( face->bbox.yMax - face->bbox.yMin, face->size->metrics.y_scale )/64.0f);
         int lineHeight = face->size->metrics.height>>6;
         if ( textLines.size() > 0 ) {
             iMaxLineHeight += (lineHeight * (textLines.size() -1));
         }
+#endif
         int txtHeight = iMaxLineHeight;
         iMaxLineHeight = MAX(iMaxLineHeight, textDefinition._dimensions.height);
 
@@ -467,6 +497,7 @@ public:
 
         //  free face
         FT_Done_Face(face);
+CCLOG("} END getBitmap");
         return true;
     }
 
