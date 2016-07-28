@@ -71,7 +71,8 @@ struct LineBreakLine {
     void calculateWidth() {
         lineWidth = 0;
         if ( glyphs.empty() == false ) {
-            lineWidth = glyphs.at(glyphs.size() - 1).paintPosition + glyphs.at(glyphs.size() - 1).horizAdvance; //glyphWidth;
+            LineBreakGlyph& glyph = glyphs.at(glyphs.size() - 1);
+            lineWidth = glyph.paintPosition + max(glyph.glyphWidth, glyph.horizAdvance - glyph.bearingX);
         }
     }
 };
