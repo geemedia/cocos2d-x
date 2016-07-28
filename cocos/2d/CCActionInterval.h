@@ -768,6 +768,96 @@ private:
     CC_DISALLOW_COPY_AND_ASSIGN(SkewBy);
 };
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/** @class RotateTo
+* @brief Rotates a Node object to a certain angle by modifying it's rotation attribute.
+The direction will be decided by the shortest angle.
+*/
+class  CC_DLL ResizeTo : public ActionInterval {
+public:
+  /**
+  * Creates the action.
+  * @brief Resize a Node object to the final size by modifying it's Size attribute.
+  * @param duration Duration time, in seconds.
+  * @param final_size The target size to reach
+  * @return An autoreleased RotateTo object.
+  */
+  static ResizeTo* create(float duration, cocos2d::Size final_size);
+
+CC_CONSTRUCTOR_ACCESS:
+  ResizeTo() {}
+  virtual ~ResizeTo() {}
+
+  //
+  // Overrides
+  //
+  virtual ResizeTo* clone() const override;
+  void startWithTarget(cocos2d::Node* target) override;
+  void update(float time) override;
+
+  /**
+  * initializes the action
+  * @param duration in seconds
+  * @param final_size in Size type
+  */
+  bool initWithDuration(float duration, cocos2d::Size final_size);
+
+protected:
+  cocos2d::Size _initial_size;
+  cocos2d::Size _final_size;
+  cocos2d::Size _size_delta;
+
+private:
+  CC_DISALLOW_COPY_AND_ASSIGN(ResizeTo);
+};
+
+
+/** @class ResizeBy
+* @brief Resize a Node object to the final size by modifying it's Size attribute.
+new size is relative to the Size of the object.
+Several ResizeBy actions can be concurrently called, and the resulting
+size will be the sum of individual resize.
+*/
+class CC_DLL ResizeBy : public ActionInterval {
+public:
+  /**
+  * Creates the action.
+  *
+  * @param duration Duration time, in seconds.
+  * @param deltaSize The delta size.
+  * @return An autoreleased ResizeBy object.
+  */
+  static ResizeBy* create(float duration, const cocos2d::Size& deltaSize);
+
+  //
+  // Overrides
+  //
+  virtual ResizeBy* clone() const override;
+  virtual ResizeBy* reverse(void) const  override;
+  virtual void startWithTarget(Node *target) override;
+  /**
+  * @param time in seconds
+  */
+  virtual void update(float time) override;
+
+CC_CONSTRUCTOR_ACCESS:
+  ResizeBy() {}
+  virtual ~ResizeBy() {}
+
+  /** initializes the action */
+  bool initWithDuration(float duration, const cocos2d::Size& deltaSize);
+
+protected:
+  cocos2d::Size _sizeDelta;
+  cocos2d::Size _startSize;
+  cocos2d::Size _previousSize;
+
+private:
+  CC_DISALLOW_COPY_AND_ASSIGN(ResizeBy);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /** @class JumpBy
  * @brief Moves a Node object simulating a parabolic jump movement by modifying it's position attribute.
 */

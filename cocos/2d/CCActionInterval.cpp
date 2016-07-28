@@ -1389,6 +1389,120 @@ SkewBy* SkewBy::reverse() const
     return SkewBy::create(_duration, -_skewX, -_skewY);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ResizeTo* ResizeTo::create(float duration, cocos2d::Size final_size) {
+  ResizeTo *ret = new (std::nothrow) ResizeTo();
+
+  if (ret) {
+    if (ret->initWithDuration(duration, final_size)) {
+      ret->autorelease();
+    } else {
+      delete ret;
+      ret = nullptr;
+    }
+  }
+
+  return ret;
+}
+
+bool ResizeTo::initWithDuration(float duration, cocos2d::Size final_size) {
+  if (cocos2d::ActionInterval::initWithDuration(duration)) {
+    _final_size = final_size;
+    return true;
+  }
+
+  return false;
+}
+
+ResizeTo* ResizeTo::clone(void) const {
+  // no copy constructor
+  ResizeTo* a = new (std::nothrow) ResizeTo();
+  a->initWithDuration(_duration, _final_size);
+  a->autorelease();
+
+  return a;
+}
+
+void ResizeTo::startWithTarget(cocos2d::Node* target) {
+  if (target) {
+    ActionInterval::startWithTarget(target);
+    _initial_size = target->getContentSize();
+    _size_delta = (_final_size - _initial_size) / _duration;
+  }
+}
+
+void ResizeTo::update(float time) {
+  if (_target) {
+    auto new_size = _initial_size + (_size_delta * time);
+
+    if (new_size.width > _final_size.width) // Avoid rounding errors, just set the final size!
+    {
+      new_size = _final_size;
+    }
+
+    _target->setContentSize(new_size);
+  }
+}
+
+//
+// ResizeBy
+//
+
+ResizeBy* ResizeBy::create(float duration, const cocos2d::Size& deltaSize) {
+  ResizeBy *ret = new (std::nothrow) ResizeBy();
+
+  if (ret) {
+    if (ret->initWithDuration(duration, deltaSize)) {
+      ret->autorelease();
+    } else {
+      delete ret;
+      ret = nullptr;
+    }
+  }
+
+  return ret;
+}
+
+bool ResizeBy::initWithDuration(float duration, const cocos2d::Size& deltaSize) {
+  bool ret = false;
+
+  if (ActionInterval::initWithDuration(duration)) {
+    _sizeDelta = deltaSize;
+    ret = true;
+  }
+
+  return ret;
+}
+
+ResizeBy* ResizeBy::clone() const {
+  // no copy constructor
+  auto a = new (std::nothrow) ResizeBy();
+  a->initWithDuration(_duration, _sizeDelta);
+  a->autorelease();
+  return a;
+}
+
+void ResizeBy::startWithTarget(Node *target) {
+  ActionInterval::startWithTarget(target);
+  _previousSize = _startSize = target->getContentSize();
+}
+
+ResizeBy* ResizeBy::reverse() const {
+  cocos2d::Size newSize;
+  newSize.width = -_sizeDelta.width;
+  newSize.height = -_sizeDelta.height;
+
+  return ResizeBy::create(_duration, newSize);
+}
+
+void ResizeBy::update(float t) {
+  if (_target) {
+    _target->setContentSize(_startSize + (_sizeDelta * t));
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //
 // JumpBy
 //
