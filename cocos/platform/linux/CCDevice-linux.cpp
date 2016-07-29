@@ -413,6 +413,8 @@ public:
             return false;
         }
 
+        _fontAscent = static_cast<int>(face->size->metrics.ascender >> 6);
+
         //compute the final line width
         iMaxLineWidth = MAX(iMaxLineWidth, textDefinition._dimensions.width);
 
@@ -425,11 +427,6 @@ public:
         memset(_data,0, iMaxLineWidth * iMaxLineHeight*4);
 
         int iCurYCursor = computeLineStartY(face, eAlignMask, txtHeight, iMaxLineHeight);
-
-        // the "ascent" needed is really that of the texture, not the font;
-        // i.e. the vertical origin of the line in the texture
-        // (note: value may be erroneous for multiple lines).
-        _fontAscent = iCurYCursor;
 
         int lineCount = textLines.size();
         for (int line = 0; line < lineCount; line++) {
