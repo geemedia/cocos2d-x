@@ -1432,12 +1432,10 @@ ResizeTo* ResizeTo::clone(void) const
 
 void ResizeTo::startWithTarget(cocos2d::Node* target)
 {
-    if (target)
-    {
-        ActionInterval::startWithTarget(target);
-        _initialSize = target->getContentSize();
-        _sizeDelta = (_finalSize - _initialSize) / _duration;
-    }
+    ActionInterval::startWithTarget(target);
+    _initialSize = target->getContentSize();
+    _sizeDelta = (_finalSize - _initialSize) / _duration;
+
 }
 
 void ResizeTo::update(float time)
@@ -1503,11 +1501,8 @@ ResizeBy* ResizeBy::clone() const
 
 void ResizeBy::startWithTarget(Node *target)
 {
-    if (target)
-    {
-        ActionInterval::startWithTarget(target);
-        _previousSize = _startSize = target->getContentSize();
-    }
+    ActionInterval::startWithTarget(target);
+    _previousSize = _startSize = target->getContentSize();
 }
 
 ResizeBy* ResizeBy::reverse() const
