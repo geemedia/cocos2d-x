@@ -180,7 +180,7 @@ bool UIRichTextXMLBasic::init()
 
 
         // RichText
-        _richText = RichText::createWithXML("This is just a s-      imple text. no xml tags here. testing the basics. testing word-wrapping. testing, testing, testing");
+        _richText = RichText::createWithXML("This is just a simple text. no xml tags here. testing the basics. testing word-wrapping. testing, testing, testing");
         _richText->ignoreContentAdaptWithSize(false);
         _richText->setContentSize(Size(100, 100));
 
