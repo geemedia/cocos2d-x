@@ -2179,28 +2179,45 @@ void ActionResize::onEnter()
 
     Size widgetSize = getContentSize();
 
-    Text* alert = Text::create("ImageView Content ResizeTo ResizeBy action. \nCan be use on any object affected by the content size.", "fonts/Marker Felt.ttf", 16);
+    Text* alert = Text::create("ImageView Content ResizeTo ResizeBy action. \nTop ImageView: Resize \nBottom ImageView: Scale", "fonts/Marker Felt.ttf", 16);
     alert->setColor(Color3B(159, 168, 176));
     alert->setPosition(Vec2(widgetSize.width / 2.0f,
-                            widgetSize.height / 2.0f - alert->getContentSize().height * 2.125f));
+                            widgetSize.height / 2.0f - alert->getContentSize().height * 1.125f));
 
     addChild(alert);
 
     // Create the imageview
-    ImageView* imageView = ImageView::create("cocosui/buttonHighlighted.png");
-    imageView->setScale9Enabled(true);
-    imageView->setContentSize(Size(50, 80));
-    imageView->setPosition(Vec2(widgetSize.width / 2.0f,
-                                widgetSize.height / 2.0f));
+    Vec2 offset(0.0f, 50.0f);
+    ImageView* imageViewResisze = ImageView::create("cocosui/buttonHighlighted.png");
+    imageViewResisze->setScale9Enabled(true);
+    imageViewResisze->setContentSize(Size(50, 40));
+    imageViewResisze->setPosition(Vec2((widgetSize.width / 2.0f) + offset.x,
+                                (widgetSize.height / 2.0f) + offset.y));
 
-    auto resizeDown = cocos2d::ResizeTo::create(2.8f, Size(50, 80));
-    auto resizeUp = cocos2d::ResizeTo::create(2.8f, Size(300, 80));
+    auto resizeDown = cocos2d::ResizeTo::create(2.8f, Size(50, 40));
+    auto resizeUp = cocos2d::ResizeTo::create(2.8f, Size(300, 40));
 
     auto resizeByDown = cocos2d::ResizeBy::create(1.8f, Size(0, -30));
     auto resizeByUp = cocos2d::ResizeBy::create(1.8f, Size(0, 30));
-    addChild(imageView);
+    addChild(imageViewResisze);
     auto rep = RepeatForever::create(Sequence::create(resizeUp, resizeDown, resizeByDown, resizeByUp, nullptr));
-    imageView->runAction(rep);
+    imageViewResisze->runAction(rep);
+
+    // Create another imageview that scale to see the difference
+    ImageView* imageViewScale = ImageView::create("cocosui/buttonHighlighted.png");
+    imageViewScale->setScale9Enabled(true);
+    imageViewScale->setContentSize(Size(50, 40));
+    imageViewScale->setPosition(Vec2(widgetSize.width / 2.0f,
+                                 widgetSize.height / 2.0f));
+
+    auto scaleDownScale = cocos2d::ScaleTo::create(2.8f, 1.0f);
+    auto scaleUpScale = cocos2d::ScaleTo::create(2.8f, 6.0f, 1.0f);
+
+    auto scaleByDownScale = cocos2d::ScaleBy::create(1.8f, 1.0f, 0.25f);
+    auto scaleByUpScale = cocos2d::ScaleBy::create(1.8f, 1.0f, 4.0f);
+    addChild(imageViewScale);
+    auto rep2 = RepeatForever::create(Sequence::create(scaleUpScale, scaleDownScale, scaleByDownScale, scaleByUpScale, nullptr));
+    imageViewScale->runAction(rep2);
 }
 
 std::string ActionResize::subtitle() const 
