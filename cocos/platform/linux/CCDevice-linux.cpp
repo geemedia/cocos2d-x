@@ -38,7 +38,6 @@ THE SOFTWARE.
 #include <string>
 #include <sstream>
 #include <fontconfig/fontconfig.h>
-//#include "base/CCDirector.h"
 
 #include "ft2build.h"
 #include FT_FREETYPE_H
