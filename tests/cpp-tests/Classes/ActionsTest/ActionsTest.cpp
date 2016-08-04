@@ -2188,10 +2188,10 @@ void ActionResize::onEnter()
 
     // Create the imageview
     Vec2 offset(0.0f, 50.0f);
-    ImageView* imageViewResisze = ImageView::create("cocosui/buttonHighlighted.png");
-    imageViewResisze->setScale9Enabled(true);
-    imageViewResisze->setContentSize(Size(50, 40));
-    imageViewResisze->setPosition(Vec2((widgetSize.width / 2.0f) + offset.x,
+    ImageView* imageViewResize = ImageView::create("cocosui/buttonHighlighted.png");
+    imageViewResize->setScale9Enabled(true);
+    imageViewResize->setContentSize(Size(50, 40));
+    imageViewResize->setPosition(Vec2((widgetSize.width / 2.0f) + offset.x,
                                 (widgetSize.height / 2.0f) + offset.y));
 
     auto resizeDown = cocos2d::ResizeTo::create(2.8f, Size(50, 40));
@@ -2199,9 +2199,9 @@ void ActionResize::onEnter()
 
     auto resizeByDown = cocos2d::ResizeBy::create(1.8f, Size(0, -30));
     auto resizeByUp = cocos2d::ResizeBy::create(1.8f, Size(0, 30));
-    addChild(imageViewResisze);
+    addChild(imageViewResize);
     auto rep = RepeatForever::create(Sequence::create(resizeUp, resizeDown, resizeByDown, resizeByUp, nullptr));
-    imageViewResisze->runAction(rep);
+    imageViewResize->runAction(rep);
 
     // Create another imageview that scale to see the difference
     ImageView* imageViewScale = ImageView::create("cocosui/buttonHighlighted.png");
