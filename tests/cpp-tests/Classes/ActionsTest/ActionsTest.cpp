@@ -2179,7 +2179,7 @@ void ActionResize::onEnter()
 
     Size widgetSize = getContentSize();
 
-    Text* alert = Text::create("ImageView Content ResizeTo ResizeBy action. \nTop ImageView: Resize \nBottom ImageView: Scale", "fonts/Marker Felt.ttf", 16);
+    Text* alert = Text::create("ImageView Content ResizeTo ResizeBy action. \nTop: ResizeTo/ResizeBy on a 9-slice ImageView  \nBottom: ScaleTo/ScaleBy on a 9-slice ImageView (for comparison)", "fonts/Marker Felt.ttf", 14);
     alert->setColor(Color3B(159, 168, 176));
     alert->setPosition(Vec2(widgetSize.width / 2.0f,
                             widgetSize.height / 2.0f - alert->getContentSize().height * 1.125f));
