@@ -1409,6 +1409,29 @@ ResizeTo* ResizeTo::create(float duration, const cocos2d::Size& final_size)
     return ret;
 }
 
+ResizeTo* ResizeTo::clone(void) const {
+    // no copy constructor
+    ResizeTo* a = new (std::nothrow) ResizeTo();
+    a->initWithDuration(_duration, _finalSize);
+    a->autorelease();
+
+    return a;
+}
+
+void ResizeTo::startWithTarget(cocos2d::Node* target) {
+    ActionInterval::startWithTarget(target);
+    _initialSize = target->getContentSize();
+    _sizeDelta = _finalSize - _initialSize;
+
+}
+
+void ResizeTo::update(float time) {
+    if (_target) {
+        auto new_size = _initialSize + (_sizeDelta * time);
+        _target->setContentSize(new_size);
+    }
+}
+
 bool ResizeTo::initWithDuration(float duration, const cocos2d::Size& final_size)
 {
     if (cocos2d::ActionInterval::initWithDuration(duration))
@@ -1418,33 +1441,6 @@ bool ResizeTo::initWithDuration(float duration, const cocos2d::Size& final_size)
     }
 
     return false;
-}
-
-ResizeTo* ResizeTo::clone(void) const
-{
-    // no copy constructor
-    ResizeTo* a = new (std::nothrow) ResizeTo();
-    a->initWithDuration(_duration, _finalSize);
-    a->autorelease();
-
-    return a;
-}
-
-void ResizeTo::startWithTarget(cocos2d::Node* target)
-{
-    ActionInterval::startWithTarget(target);
-    _initialSize = target->getContentSize();
-    _sizeDelta = _finalSize - _initialSize;
-
-}
-
-void ResizeTo::update(float time)
-{
-    if (_target)
-    {
-        auto new_size = _initialSize + (_sizeDelta * time); 
-        _target->setContentSize(new_size);
-    }
 }
 
 //
@@ -1471,6 +1467,30 @@ ResizeBy* ResizeBy::create(float duration, const cocos2d::Size& deltaSize)
     return ret;
 }
 
+ResizeBy* ResizeBy::clone() const {
+    // no copy constructor
+    auto a = new (std::nothrow) ResizeBy();
+    a->initWithDuration(_duration, _sizeDelta);
+    a->autorelease();
+    return a;
+}
+
+void ResizeBy::startWithTarget(Node *target) {
+    ActionInterval::startWithTarget(target);
+    _previousSize = _startSize = target->getContentSize();
+}
+
+ResizeBy* ResizeBy::reverse() const {
+    cocos2d::Size newSize(-_sizeDelta.width, -_sizeDelta.height);
+    return ResizeBy::create(_duration, newSize);
+}
+
+void ResizeBy::update(float t) {
+    if (_target) {
+        _target->setContentSize(_startSize + (_sizeDelta * t));
+    }
+}
+
 bool ResizeBy::initWithDuration(float duration, const cocos2d::Size& deltaSize)
 {
     bool ret = false;
@@ -1482,35 +1502,6 @@ bool ResizeBy::initWithDuration(float duration, const cocos2d::Size& deltaSize)
     }
     
     return ret;
-}
-
-ResizeBy* ResizeBy::clone() const
-{
-    // no copy constructor
-    auto a = new (std::nothrow) ResizeBy();
-    a->initWithDuration(_duration, _sizeDelta);
-    a->autorelease();
-    return a;
-}
-
-void ResizeBy::startWithTarget(Node *target)
-{
-    ActionInterval::startWithTarget(target);
-    _previousSize = _startSize = target->getContentSize();
-}
-
-ResizeBy* ResizeBy::reverse() const
-{
-    cocos2d::Size newSize(-_sizeDelta.width, -_sizeDelta.height);
-    return ResizeBy::create(_duration, newSize);
-}
-
-void ResizeBy::update(float t)
-{
-    if (_target)
-    {
-        _target->setContentSize(_startSize + (_sizeDelta * t));
-    }
 }
 
 //
