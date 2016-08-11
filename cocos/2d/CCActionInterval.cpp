@@ -1409,17 +1409,6 @@ ResizeTo* ResizeTo::create(float duration, const cocos2d::Size& final_size)
     return ret;
 }
 
-bool ResizeTo::initWithDuration(float duration, const cocos2d::Size& final_size)
-{
-    if (cocos2d::ActionInterval::initWithDuration(duration))
-    {
-        _finalSize = final_size;
-        return true;
-    }
-
-    return false;
-}
-
 ResizeTo* ResizeTo::clone(void) const
 {
     // no copy constructor
@@ -1434,8 +1423,7 @@ void ResizeTo::startWithTarget(cocos2d::Node* target)
 {
     ActionInterval::startWithTarget(target);
     _initialSize = target->getContentSize();
-    _sizeDelta = (_finalSize - _initialSize) / _duration;
-
+    _sizeDelta = _finalSize - _initialSize;
 }
 
 void ResizeTo::update(float time)
@@ -1443,14 +1431,19 @@ void ResizeTo::update(float time)
     if (_target)
     {
         auto new_size = _initialSize + (_sizeDelta * time);
-        
-        if (new_size.width > _finalSize.width) // Avoid rounding errors, just set the final size!
-        {
-            new_size = _finalSize;
-        }
-        
         _target->setContentSize(new_size);
     }
+}
+
+bool ResizeTo::initWithDuration(float duration, const cocos2d::Size& final_size)
+{
+    if (cocos2d::ActionInterval::initWithDuration(duration))
+    {
+        _finalSize = final_size;
+        return true;
+    }
+
+    return false;
 }
 
 //
@@ -1472,19 +1465,6 @@ ResizeBy* ResizeBy::create(float duration, const cocos2d::Size& deltaSize)
               delete ret;
               ret = nullptr;
         }
-    }
-    
-    return ret;
-}
-
-bool ResizeBy::initWithDuration(float duration, const cocos2d::Size& deltaSize)
-{
-    bool ret = false;
-    
-    if (ActionInterval::initWithDuration(duration))
-    {
-        _sizeDelta = deltaSize;
-        ret = true;
     }
     
     return ret;
@@ -1517,6 +1497,19 @@ void ResizeBy::update(float t)
     {
         _target->setContentSize(_startSize + (_sizeDelta * t));
     }
+}
+
+bool ResizeBy::initWithDuration(float duration, const cocos2d::Size& deltaSize)
+{
+    bool ret = false;
+    
+    if (ActionInterval::initWithDuration(duration))
+    {
+        _sizeDelta = deltaSize;
+        ret = true;
+    }
+    
+    return ret;
 }
 
 //
