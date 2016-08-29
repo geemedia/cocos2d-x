@@ -73,17 +73,12 @@ AudioEngine::AudioEngineThreadPool* AudioEngine::s_threadPool = nullptr;
 class AudioEngine::AudioEngineThreadPool
 {
 public:
-    AudioEngineThreadPool(bool detach, int threads = 4)
-        : _detach(detach)
-        , _stop(false)
+    AudioEngineThreadPool(int threads = 4)
+        : _stop(false)
     {
         for (int index = 0; index < threads; ++index)
         {
             _workers.emplace_back(std::thread(std::bind(&AudioEngineThreadPool::threadFunc, this)));
-            if (_detach)
-            {
-                _workers[index].detach();
-            }
         }
     }
 
@@ -101,13 +96,10 @@ public:
             _taskCondition.notify_all();
         }
 
-        if (!_detach)
-        {
             for (auto&& worker : _workers) {
                 worker.join();
             }
         }
-    }
 
 private:
     void threadFunc()
@@ -141,7 +133,6 @@ private:
 
     std::mutex _queueMutex;
     std::condition_variable _taskCondition;
-    bool _detach;
     bool _stop;
 };
 
@@ -172,15 +163,10 @@ bool AudioEngine::lazyInit()
         }
     }
 
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if CC_TARGET_PLATFORM != CC_PLATFORM_ANDROID
     if (_audioEngineImpl && s_threadPool == nullptr)
     {
-        s_threadPool = new (std::nothrow) AudioEngineThreadPool(true);
-    }
-#elif CC_TARGET_PLATFORM != CC_PLATFORM_ANDROID
-    if (_audioEngineImpl && s_threadPool == nullptr)
-    {
-        s_threadPool = new (std::nothrow) AudioEngineThreadPool(false);
+        s_threadPool = new (std::nothrow) AudioEngineThreadPool();
     }
 #endif
 

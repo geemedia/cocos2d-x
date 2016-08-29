@@ -1,7 +1,9 @@
 #ifdef CC_USE_FMOD_EX
 #include "AudioEngine-fmodex.h"
 #include <cstring>
+#if CC_TARGET_PLATFORM != CC_PLATFORM_WIN32
 #include <unistd.h>
+#endif
 #include <unordered_map>
 #include <fmod_errors.h>
 #include "audio/include/AudioEngine.h"
@@ -55,6 +57,11 @@ AudioEngineImpl::AudioEngineImpl()
 
 AudioEngineImpl::~AudioEngineImpl()
 {
+    if (!_lazyInitLoop)
+    {
+        auto scheduler = cocos2d::Director::getInstance()->getScheduler();
+        scheduler->unschedule(schedule_selector(AudioEngineImpl::update), this);
+    }
     ERRCHECKWITHEXIT(_fmodSystem->close());
     ERRCHECKWITHEXIT(_fmodSystem->release());
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
@@ -83,9 +90,6 @@ bool AudioEngineImpl::init()
 
         _channelInfoMap.clear();
         _soundMap.clear();
-
-        auto scheduler = cocos2d::Director::getInstance()->getScheduler();
-        scheduler->schedule(schedule_selector(AudioEngineImpl::update), this, 0.05f, false);
 
         g_AudioEngineImpl = this;
         success = true;
@@ -124,13 +128,18 @@ int AudioEngineImpl::preload(const std::string& filePath, std::function<void(boo
 {
     FMOD::Sound* sound = findSound(filePath);
     if (sound == nullptr) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+        std::string fullPath = FileUtils::getInstance()->fullPathForFilename(filePath);
+        FMOD_RESULT result = _fmodSystem->createSound(fullPath.c_str(), FMOD_LOOP_OFF, nullptr, &sound);
+#else
         Data soundData = FileUtils::getInstance()->getDataFromFile(filePath);
         FMOD_CREATESOUNDEXINFO exinfo;
         memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
         exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-        exinfo.length = static_cast<int>(soundData.getSize());
+        exinfo.length = static_cast<unsigned int>(soundData.getSize());
         FMOD_MODE mode = FMOD_HARDWARE | FMOD_OPENMEMORY | FMOD_LOOP_OFF;
-        FMOD_RESULT result = _fmodSystem->createSound(reinterpret_cast<const char*>(soundData.getBytes()), mode, &exinfo, &sound);
+        FMOD_RESULT result = _fmodSystem->createSound(reinterpret_cast<char*>(soundData.getBytes()), mode, &exinfo, &sound);
+#endif
         if (ERRCHECK(result)) {
             CCLOG("Sound effect in %s could not be preloaded\n", filePath.c_str());
             if (callback) {

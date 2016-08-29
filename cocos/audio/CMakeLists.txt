@@ -32,10 +32,8 @@ elseif(LINUX)
     )
     
     if(USE_FMOD_EX)
-        list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/fmodex/AudioEngine-fmodex.h)
         list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/fmodex/AudioEngine-fmodex.cpp)
     else()
-        list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/linux/AudioEngine-linux.h)
         list(APPEND COCOS_AUDIO_PLATFORM_SRC audio/linux/AudioEngine-linux.cpp)
     endif()
 
