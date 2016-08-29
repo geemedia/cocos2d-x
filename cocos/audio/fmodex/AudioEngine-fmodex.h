@@ -10,6 +10,7 @@
 #include <map>
 #include <set>
 #include <fmod.hpp>
+#include "audio/AudioEngineImplInterface.h"
 #include "audio/include/AudioEngine.h"
 #include "base/CCRef.h"
 
@@ -22,14 +23,14 @@
 NS_CC_BEGIN
 namespace experimental{
 
-class CC_DLL AudioEngineImpl : public cocos2d::Ref
+class CC_DLL AudioEngineImpl : public AudioEngineImplInterface
 {
 public:
     AudioEngineImpl();
     ~AudioEngineImpl();
     
     bool init();
-    int play2d(const std::string &fileFullPath, bool loop, float volume);
+    int play2d(const std::string &fileFullPath, bool loop, float volume, int audioId);
     void setVolume(int audioID, float volume);
     void setLoop(int audioID, bool loop);
     bool pause(int audioID);
@@ -43,7 +44,7 @@ public:
     
     void uncache(const std::string& filePath);
     void uncacheAll();
-    int preload(const std::string& filePath, std::function<void(bool)> callback);
+    void preload(const std::string& filePath, std::function<void(bool)> callback);
     
     void update(float dt);
     
@@ -51,6 +52,7 @@ public:
     void onSoundFinished(FMOD::Channel* channel);
 
 private:
+    int _preload(const std::string& filePath, std::function<void(bool)> callback);
     // returns null if a sound with the given path is not found
     FMOD::Sound* findSound(const std::string &path);
 

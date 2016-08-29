@@ -31,6 +31,7 @@
 #include <unordered_map>
 
 #include "base/CCRef.h"
+#include "audio/AudioEngineImplInterface.h"
 #include "audio/win32/AudioCache.h"
 #include "audio/win32/AudioPlayer.h"
 
@@ -38,14 +39,14 @@ NS_CC_BEGIN
     namespace experimental{
 #define MAX_AUDIOINSTANCES 32
 
-class CC_DLL AudioEngineImpl : public cocos2d::Ref
+class CC_DLL AudioEngineImpl : public AudioEngineImplInterface
 {
 public:
     AudioEngineImpl();
     ~AudioEngineImpl();
     
     bool init();
-    int play2d(const std::string &fileFullPath ,bool loop ,float volume);
+    int play2d(const std::string &fileFullPath, bool loop, float volume, int audioId);
     void setVolume(int audioID,float volume);
     void setLoop(int audioID, bool loop);
     bool pause(int audioID);
@@ -59,12 +60,13 @@ public:
     
     void uncache(const std::string& filePath);
     void uncacheAll();
-    AudioCache* preload(const std::string& filePath, std::function<void(bool)> callback);
+    void preload(const std::string& filePath, std::function<void(bool)> callback);
     
     void update(float dt);
     
 private:
     void _play2d(AudioCache *cache, int audioID);
+    AudioCache* _preload(const std::string& filePath, std::function<void(bool)> callback);
     
     ALuint _alSources[MAX_AUDIOINSTANCES];
     

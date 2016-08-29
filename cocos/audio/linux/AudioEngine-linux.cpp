@@ -38,8 +38,9 @@ FMOD_RESULT F_CALLBACK channelCallback(FMOD_CHANNELCONTROL *channelcontrol,
 }
 #endif
 
-AudioEngineImpl::AudioEngineImpl(){
-};
+AudioEngineImpl::AudioEngineImpl()
+: _currentAudioID(0) {
+}
 
 AudioEngineImpl::~AudioEngineImpl(){
 #ifndef CC_DISABLE_FMOD
@@ -49,7 +50,7 @@ AudioEngineImpl::~AudioEngineImpl(){
   result = pSystem->release();
   ERRCHECKWITHEXIT(result);
 #endif
-};
+}
 
     
 bool AudioEngineImpl::init(){
@@ -76,11 +77,14 @@ bool AudioEngineImpl::init(){
   g_AudioEngineImpl = this; 
   
   return true;
-};
+}
 
-int AudioEngineImpl::play2d(const std::string &fileFullPath ,bool loop ,float volume){
+int AudioEngineImpl::play2d(const std::string &fileFullPath, bool loop, float volume, int audioId){
 #ifndef CC_DISABLE_FMOD
-  int id = preload(fileFullPath, nullptr); 
+  if (audioId != AudioEngine::INVALID_AUDIO_ID && audioId > _currentAudioID)
+    _currentAudioID = audioId;
+  
+  int id = _preload(fileFullPath, nullptr); 
   if(id >= 0){
     mapChannelInfo[id].loop=loop;  
     mapChannelInfo[id].channel->setPaused(true); 
@@ -92,7 +96,7 @@ int AudioEngineImpl::play2d(const std::string &fileFullPath ,bool loop ,float vo
 #else
   return 0;
 #endif
-};
+}
 
 void AudioEngineImpl::setVolume(int audioID,float volume){
 #ifndef CC_DISABLE_FMOD
@@ -102,7 +106,7 @@ void AudioEngineImpl::setVolume(int audioID,float volume){
       printf("AudioEngineImpl::setVolume: invalid audioID: %d\n", audioID);
   }
 #endif
-};
+}
 
 void AudioEngineImpl::setLoop(int audioID, bool loop){
 #ifndef CC_DISABLE_FMOD
@@ -112,7 +116,7 @@ void AudioEngineImpl::setLoop(int audioID, bool loop){
       printf("AudioEngineImpl::setLoop: invalid audioID: %d\n", audioID);
   }
 #endif
-};
+}
 
 bool AudioEngineImpl::pause(int audioID){
 #ifndef CC_DISABLE_FMOD
@@ -127,7 +131,7 @@ bool AudioEngineImpl::pause(int audioID){
 #else
   return true;
 #endif
-};
+}
 
 bool AudioEngineImpl::resume(int audioID){
 #ifndef CC_DISABLE_FMOD
@@ -159,7 +163,7 @@ bool AudioEngineImpl::resume(int audioID){
 #else
   return true;
 #endif
-};
+}
 
 bool AudioEngineImpl::stop(int audioID){
 #ifndef CC_DISABLE_FMOD
@@ -174,7 +178,7 @@ bool AudioEngineImpl::stop(int audioID){
 #else
   return true;
 #endif
-};
+}
 
 void AudioEngineImpl::stopAll(){
 #ifndef CC_DISABLE_FMOD
@@ -184,7 +188,7 @@ void AudioEngineImpl::stopAll(){
     audioRef.channel = nullptr;
   }
 #endif
-};
+}
 
 float AudioEngineImpl::getDuration(int audioID){
 #ifndef CC_DISABLE_FMOD
@@ -202,7 +206,7 @@ float AudioEngineImpl::getDuration(int audioID){
 #else
   return 0;
 #endif
-};
+}
 
 float AudioEngineImpl::getCurrentTime(int audioID){
 #ifndef CC_DISABLE_FMOD
@@ -219,7 +223,7 @@ float AudioEngineImpl::getCurrentTime(int audioID){
 #else
   return 0;
 #endif
-};
+}
 
 bool AudioEngineImpl::setCurrentTime(int audioID, float time){
 #ifndef CC_DISABLE_FMOD
@@ -233,7 +237,7 @@ bool AudioEngineImpl::setCurrentTime(int audioID, float time){
 #else
   return true;
 #endif
-};
+}
 
 void AudioEngineImpl::setFinishCallback(int audioID, const std::function<void (int, const std::string &)> &callback){
 #ifndef CC_DISABLE_FMOD
@@ -246,7 +250,7 @@ void AudioEngineImpl::setFinishCallback(int audioID, const std::function<void (i
       printf("AudioEngineImpl::setFinishCallback: invalid audioID: %d\n", audioID);
   }
 #endif
-};
+}
 
 #ifndef CC_DISABLE_FMOD
 void AudioEngineImpl::onSoundFinished(FMOD::Channel * channel){
@@ -262,7 +266,7 @@ void AudioEngineImpl::onSoundFinished(FMOD::Channel * channel){
     }catch(const std::out_of_range& oor){
       printf("AudioEngineImpl::onSoundFinished: invalid audioID: %d\n", id);
   }
-}; 
+}
 #endif
 
 void AudioEngineImpl::uncache(const std::string& path){
@@ -289,10 +293,13 @@ void AudioEngineImpl::uncacheAll(){
   }
   mapSound.clear();
 #endif
-};
+}
 
-    
-int AudioEngineImpl::preload(const std::string& filePath, std::function<void(bool isSuccess)> callback){
+void AudioEngineImpl::preload(const std::string& filePath, std::function<void(bool isSuccess)> callback){
+  _preload(filePath, callback);
+}
+
+int AudioEngineImpl::_preload(const std::string& filePath, std::function<void(bool isSuccess)> callback){
 #ifndef CC_DISABLE_FMOD
   FMOD::Sound * sound = findSound(filePath); 
   if(!sound){
@@ -308,7 +315,7 @@ int AudioEngineImpl::preload(const std::string& filePath, std::function<void(boo
     mapSound[fullPath] = sound; 
   }
   
-  int id = mapChannelInfo.size() + 1;
+  int id = _currentAudioID++;
   auto& chanelInfo = mapChannelInfo[id];
   chanelInfo.sound = sound; 
   chanelInfo.id = (size_t) id; 
@@ -325,14 +332,14 @@ int AudioEngineImpl::preload(const std::string& filePath, std::function<void(boo
 #else
   return 0;
 #endif
-};
+}
 
 
 void AudioEngineImpl::update(float dt){
 #ifndef CC_DISABLE_FMOD
   pSystem->update();
 #endif
-};
+}
 
 #ifndef CC_DISABLE_FMOD
 FMOD::Sound * AudioEngineImpl::findSound(const std::string &path){
@@ -348,5 +355,5 @@ FMOD::Channel * AudioEngineImpl::getChannel(FMOD::Sound *sound){
   sound->getUserData(&data);
   id = (size_t) data; 
   return mapChannelInfo[id].channel; 
-};
+}
 #endif

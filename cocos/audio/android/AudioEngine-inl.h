@@ -32,6 +32,7 @@
 #include <unordered_map>
 #include "base/CCRef.h"
 #include "base/ccUtils.h"
+#include "audio/AudioEngineImplInterface.h"
 
 #define MAX_AUDIOINSTANCES 24
 
@@ -67,14 +68,14 @@ private:
     friend class AudioEngineImpl;
 };
 
-class AudioEngineImpl : public cocos2d::Ref
+class AudioEngineImpl : public AudioEngineImplInterface
 {
 public:
     AudioEngineImpl();
     ~AudioEngineImpl();
 
     bool init();
-    int play2d(const std::string &fileFullPath ,bool loop ,float volume);
+    int play2d(const std::string &fileFullPath ,bool loop ,float volume, int audioId);
     void setVolume(int audioID,float volume);
     void setLoop(int audioID, bool loop);
     void pause(int audioID);

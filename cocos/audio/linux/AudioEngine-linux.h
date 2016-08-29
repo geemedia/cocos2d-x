@@ -35,6 +35,7 @@
 #include "fmod.hpp"
 #include "fmod_errors.h"
 #endif
+#include "audio/AudioEngineImplInterface.h"
 #include "audio/include/AudioEngine.h"
 
 #include "base/CCRef.h"
@@ -43,14 +44,14 @@ NS_CC_BEGIN
     namespace experimental{
 #define MAX_AUDIOINSTANCES 32
 
-class CC_DLL AudioEngineImpl : public cocos2d::Ref
+class CC_DLL AudioEngineImpl : public AudioEngineImplInterface
 {
 public:
     AudioEngineImpl();
     ~AudioEngineImpl();
     
     bool init();
-    int play2d(const std::string &fileFullPath ,bool loop ,float volume);
+    int play2d(const std::string &fileFullPath, bool loop, float volume, int audioId);
     void setVolume(int audioID,float volume);
     void setLoop(int audioID, bool loop);
     bool pause(int audioID);
@@ -64,9 +65,8 @@ public:
     
     void uncache(const std::string& filePath);
     void uncacheAll();
-    
 
-    int preload(const std::string& filePath, std::function<void(bool isSuccess)> callback);
+    void preload(const std::string& filePath, std::function<void(bool isSuccess)> callback);
     
     void update(float dt);
     
@@ -78,6 +78,7 @@ public:
 #endif
 
 private:
+    int _preload(const std::string& filePath, std::function<void(bool isSuccess)> callback);
 
 #ifndef CC_DISABLE_FMOD
     /**
@@ -102,6 +103,7 @@ private:
     std::map<std::string, FMOD::Sound *> mapSound;  
     
     FMOD::System* pSystem;
+    int _currentAudioID;
 #endif
 };
 }

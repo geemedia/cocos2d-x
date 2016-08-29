@@ -1950,6 +1950,9 @@
     <ClCompile Include="..\editor-support\cocostudio\LocalizationManager.cpp">
       <Filter>cocostudio\json</Filter>
     </ClCompile>
+    <ClCompile Include="..\audio\null\AudioEngineImplNull.cpp">
+      <Filter>audioengine</Filter>
+    </ClCompile>
     <ClCompile Include="..\audio\fmodex\AudioEngine-fmodex.cpp">
       <Filter>audioengine</Filter>
     </ClCompile>
@@ -3811,6 +3814,12 @@
     </ClInclude>
     <ClInclude Include="..\editor-support\cocostudio\LocalizationManager.h">
       <Filter>cocostudio\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\audio\AudioEngineImplInterface.h">
+      <Filter>audioengine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\audio\null\AudioEngineImplNull.h">
+      <Filter>audioengine</Filter>
     </ClInclude>
     <ClInclude Include="..\audio\fmodex\AudioEngine-fmodex.h">
       <Filter>audioengine</Filter>
