@@ -1,4 +1,4 @@
-    /****************************************************************************
+/****************************************************************************
  Copyright (c) 2016 Global Eagle Entertainment
 
  http://www.cocos2d-x.org
@@ -46,13 +46,13 @@ bool AudioEngineImplNull::init()
     return true;
 }
 
-int AudioEngineImplNull::play2d(const std::string &fileFullPath, bool loop, float volume, int audioId)
+int AudioEngineImplNull::play2d(const std::string& /*fileFullPath*/, bool /*loop*/, float /*volume*/, int /*audioID*/)
 {
     AudioEngine::_audioIDInfoMap[_currentAudioID].state = AudioEngine::AudioState::PLAYING;
     return _currentAudioID++;
 }
 
-void AudioEngineImplNull::setVolume(int audioID,float volume)
+void AudioEngineImplNull::setVolume(int audioID, float volume)
 {
     AudioEngine::_audioIDInfoMap[audioID].volume = volume;
 }
@@ -74,7 +74,7 @@ bool AudioEngineImplNull::resume(int audioID)
     return true;
 }
 
-bool AudioEngineImplNull::stop(int audioID)
+bool AudioEngineImplNull::stop(int /*audioID*/)
 {
     return true;
 }
@@ -99,12 +99,12 @@ bool AudioEngineImplNull::setCurrentTime(int audioID, float time)
     return true;
 }
 
-void AudioEngineImplNull::setFinishCallback(int audioID, const std::function<void (int, const std::string &)> &callback)
+void AudioEngineImplNull::setFinishCallback(int audioID, const std::function<void (int, const std::string &)>& callback)
 {
     AudioEngine::_audioIDInfoMap[audioID].finishCallback = callback;
 }
 
-void AudioEngineImplNull::uncache(const std::string& filePath)
+void AudioEngineImplNull::uncache(const std::string& /*filePath*/)
 {
 }
 
@@ -112,7 +112,7 @@ void AudioEngineImplNull::uncacheAll()
 {
 }
 
-void AudioEngineImplNull::preload(const std::string& filePath, std::function<void(bool)> callback)
+void AudioEngineImplNull::preload(const std::string& /*filePath*/, std::function<void(bool)> /*callback*/)
 {
 }
 
@@ -129,11 +129,18 @@ void experimental::AudioEngineImplNull::update(float dt)
         {
             if (info.second.loop)
             {
-                do
+                if (info.second.duration > 0)
                 {
-                    info.second.currentTime -= info.second.duration;
+                    do
+                    {
+                        info.second.currentTime -= info.second.duration;
+                    }
+                    while (info.second.currentTime >= info.second.duration);
                 }
-                while (info.second.currentTime >= info.second.duration);
+                else
+                {
+                    info.second.currentTime = 0;
+                }
             }
             else
             {

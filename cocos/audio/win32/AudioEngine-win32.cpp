@@ -181,7 +181,7 @@ AudioCache* AudioEngineImpl::_preload(const std::string& filePath, std::function
     return audioCache;
 }
 
-int AudioEngineImpl::play2d(const std::string &filePath, bool loop, float volume, int audioId)
+int AudioEngineImpl::play2d(const std::string& filePath, bool loop, float volume, int audioID)
 {
     bool availableSourceExist = false;
     ALuint alSource;
@@ -202,8 +202,8 @@ int AudioEngineImpl::play2d(const std::string &filePath, bool loop, float volume
         return AudioEngine::INVALID_AUDIO_ID;
     }
     
-    if (audioId != AudioEngine::INVALID_AUDIO_ID && audioId > _currentAudioID)
-      _currentAudioID = audioId;
+    if (audioID != AudioEngine::INVALID_AUDIO_ID && audioID > _currentAudioID)
+      _currentAudioID = audioID;
 
     auto player = &_audioPlayers[_currentAudioID];
     player->_alSource = alSource;
@@ -223,7 +223,7 @@ int AudioEngineImpl::play2d(const std::string &filePath, bool loop, float volume
     return _currentAudioID++;
 }
 
-void AudioEngineImpl::_play2d(AudioCache *cache, int audioID)
+void AudioEngineImpl::_play2d(AudioCache* cache, int audioID)
 {
     if(cache->_alBufferReady){
         auto playerIt = _audioPlayers.find(audioID);
@@ -246,7 +246,7 @@ void AudioEngineImpl::_play2d(AudioCache *cache, int audioID)
     }
 }
 
-void AudioEngineImpl::setVolume(int audioID,float volume)
+void AudioEngineImpl::setVolume(int audioID, float volume)
 {
     auto& player = _audioPlayers[audioID];
     player._volume = volume;

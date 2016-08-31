@@ -31,10 +31,8 @@
 #include <functional>
 #include <iostream>
 #include <map>
-#ifndef CC_DISABLE_FMOD
 #include "fmod.hpp"
 #include "fmod_errors.h"
-#endif
 #include "audio/AudioEngineImplInterface.h"
 #include "audio/include/AudioEngine.h"
 
@@ -50,37 +48,34 @@ public:
     AudioEngineImpl();
     ~AudioEngineImpl();
     
-    bool init();
-    int play2d(const std::string &fileFullPath, bool loop, float volume, int audioId);
-    void setVolume(int audioID,float volume);
-    void setLoop(int audioID, bool loop);
-    bool pause(int audioID);
-    bool resume(int audioID);
-    bool stop(int audioID);
-    void stopAll();
-    float getDuration(int audioID);
+    bool init() override;
+    int play2d(const std::string& fileFullPath, bool loop, float volume, int audioID) override;
+    void setVolume(int audioID, float volume) override;
+    void setLoop(int audioID, bool loop) override;
+    bool pause(int audioID) override;
+    bool resume(int audioID) override;
+    bool stop(int audioID) override;
+    void stopAll() override;
+    float getDuration(int audioID) override;
     float getCurrentTime(int audioID);
-    bool setCurrentTime(int audioID, float time);
-    void setFinishCallback(int audioID, const std::function<void (int, const std::string &)> &callback);
+    bool setCurrentTime(int audioID, float time) override;
+    void setFinishCallback(int audioID, const std::function<void (int, const std::string &)> &callback) override;
     
-    void uncache(const std::string& filePath);
-    void uncacheAll();
+    void uncache(const std::string& filePath) override;
+    void uncacheAll() override;
 
-    void preload(const std::string& filePath, std::function<void(bool isSuccess)> callback);
+    void preload(const std::string& filePath, std::function<void(bool isSuccess)> callback) override;
     
     void update(float dt);
     
     /**
      * used internally by ffmod callback 
-     */ 
-#ifndef CC_DISABLE_FMOD
-    void onSoundFinished(FMOD::Channel * channel); 
-#endif
+     */
+    void onSoundFinished(FMOD::Channel * channel);
 
 private:
     int _preload(const std::string& filePath, std::function<void(bool isSuccess)> callback);
 
-#ifndef CC_DISABLE_FMOD
     /**
     * returns null if a sound with the given path is not found
     */
@@ -104,7 +99,6 @@ private:
     
     FMOD::System* pSystem;
     int _currentAudioID;
-#endif
 };
 }
 NS_CC_END

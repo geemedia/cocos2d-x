@@ -42,7 +42,7 @@ public:
     AudioEngineImplNull(int currentAudioID);
     ~AudioEngineImplNull();
     bool init() override;
-    int play2d(const std::string &fileFullPath, bool loop, float volume, int audioId) override;
+    int play2d(const std::string& fileFullPath, bool loop, float volume, int audioID) override;
     void setVolume(int audioID,float volume) override;
     void setLoop(int audioID, bool loop) override;
     bool pause(int audioID) override;
@@ -52,7 +52,7 @@ public:
     float getDuration(int audioID) override;
     float getCurrentTime(int audioID) override;
     bool setCurrentTime(int audioID, float time) override;
-    void setFinishCallback(int audioID, const std::function<void (int, const std::string &)> &callback) override;
+    void setFinishCallback(int audioID, const std::function<void (int, const std::string &)>& callback) override;
     void uncache(const std::string& filePath) override;
     void uncacheAll() override;
     void preload(const std::string& filePath, std::function<void(bool)> callback) override;

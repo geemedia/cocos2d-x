@@ -240,7 +240,7 @@ bool AudioEngineImpl::init()
     return true;
 }
 
-int AudioEngineImpl::play2d(const std::string &filePath ,bool loop ,float volume, int /*audioId*/)
+int AudioEngineImpl::play2d(const std::string& filePath, bool loop, float volume, int /*audioID*/)
 {
     auto audioId = AudioEngine::INVALID_AUDIO_ID;
 
@@ -266,7 +266,7 @@ int AudioEngineImpl::play2d(const std::string &filePath ,bool loop ,float volume
     return audioId;
 }
 
-void AudioEngineImpl::initPlayerCallback(AudioPlayer *player, int audioID)
+void AudioEngineImpl::initPlayerCallback(AudioPlayer* player, int audioID)
 {
     if (player->_initSucceed)
     {
@@ -322,7 +322,7 @@ void AudioEngineImpl::update(float dt)
     }
 }
 
-void AudioEngineImpl::setVolume(int audioID,float volume)
+void AudioEngineImpl::setVolume(int audioID, float volume)
 {
     auto& player = _audioPlayers[audioID];
     player_set_volume(player._playerHandle, volume, volume);
@@ -389,12 +389,12 @@ bool AudioEngineImpl::setCurrentTime(int audioID, float time)
     return true;
 }
 
-void AudioEngineImpl::setFinishCallback(int audioID, const std::function<void (int, const std::string &)> &callback)
+void AudioEngineImpl::setFinishCallback(int audioID, const std::function<void (int, const std::string &)>& callback)
 {
     _audioPlayers[audioID]._finishCallback = callback;
 }
 
-void AudioEngineImpl::preload(const std::string& filePath, std::function<void(bool)> callback)
+void AudioEngineImpl::preload(const std::string& /*filePath*/, std::function<void(bool)> /*callback*/)
 {
     //TODO: implement preload on Tizen platform.
 }

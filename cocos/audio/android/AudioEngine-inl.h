@@ -48,7 +48,7 @@ public:
     AudioPlayer();
     ~AudioPlayer();
 
-    bool init(SLEngineItf engineEngine, SLObjectItf outputMixObject,const std::string& fileFullPath, float volume, bool loop);
+    bool init(SLEngineItf engineEngine, SLObjectItf outputMixObject, const std::string& fileFullPath, float volume, bool loop);
 
     bool _playOver;
     bool _loop;
@@ -75,21 +75,21 @@ public:
     ~AudioEngineImpl();
 
     bool init();
-    int play2d(const std::string &fileFullPath ,bool loop ,float volume, int audioId);
-    void setVolume(int audioID,float volume);
-    void setLoop(int audioID, bool loop);
-    void pause(int audioID);
-    void resume(int audioID);
-    void stop(int audioID);
-    void stopAll();
-    float getDuration(int audioID);
-    float getCurrentTime(int audioID);
-    bool setCurrentTime(int audioID, float time);
-    void setFinishCallback(int audioID, const std::function<void (int, const std::string &)> &callback);
+    int play2d(const std::string&fileFullPath, bool loop, float volume, int audioID) override;
+    void setVolume(int audioID, float volume) override;
+    void setLoop(int audioID, bool loop) override;
+    void pause(int audioID) override;
+    void resume(int audioID) override;
+    void stop(int audioID) override;
+    void stopAll() override;
+    float getDuration(int audioID) override;
+    float getCurrentTime(int audioID) override;
+    bool setCurrentTime(int audioID, float time) override;
+    void setFinishCallback(int audioID, const std::function<void (int, const std::string &)> &callback) override;
 
-    void uncache(const std::string& filePath){}
-    void uncacheAll(){}
-    void preload(const std::string& filePath, std::function<void(bool)> callback);
+    void uncache(const std::string& filePath) override {}
+    void uncacheAll() override {}
+    void preload(const std::string& filePath, std::function<void(bool)> callback) override;
     
     void update(float dt);
 private:

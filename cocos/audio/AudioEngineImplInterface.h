@@ -34,12 +34,13 @@
 NS_CC_BEGIN
 namespace experimental{
 
+/// Interface for the AudioEngine implementation classes.
 class CC_DLL AudioEngineImplInterface : public cocos2d::Ref
 {
 public:
     virtual bool init() = 0;
-    virtual int play2d(const std::string &fileFullPath, bool loop, float volume, int audioId = -1) = 0;
-    virtual void setVolume(int audioID,float volume) = 0;
+    virtual int play2d(const std::string& fileFullPath, bool loop, float volume, int audioID = -1) = 0;
+    virtual void setVolume(int audioID, float volume) = 0;
     virtual void setLoop(int audioID, bool loop) = 0;
     virtual bool pause(int audioID) = 0;
     virtual bool resume(int audioID) = 0;
@@ -48,7 +49,7 @@ public:
     virtual float getDuration(int audioID) = 0;
     virtual float getCurrentTime(int audioID) = 0;
     virtual bool setCurrentTime(int audioID, float time) = 0;
-    virtual void setFinishCallback(int audioID, const std::function<void (int, const std::string &)> &callback) = 0;
+    virtual void setFinishCallback(int audioID, const std::function<void (int, const std::string &)>& callback) = 0;
     
     virtual void uncache(const std::string& filePath) = 0;
     virtual void uncacheAll() = 0;
