@@ -28,9 +28,11 @@
 #include <condition_variable>
 #include <queue>
 #include "platform/CCFileUtils.h"
+#include "base/CCDirector.h"
+#include "base/CCScheduler.h"
 #include "base/ccUtils.h"
 
-
+#include "audio/null/AudioEngineImplNull.h"
 #if CC_USE_FMOD_EX
 #include "audio/fmodex/AudioEngine-fmodex.h"
 #elif CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
@@ -66,24 +68,20 @@ std::unordered_map<std::string, AudioEngine::ProfileHelper> AudioEngine::_audioP
 unsigned int AudioEngine::_maxInstances = MAX_AUDIOINSTANCES;
 AudioEngine::ProfileHelper* AudioEngine::_defaultProfileHelper = nullptr;
 std::unordered_map<int, AudioEngine::AudioInfo> AudioEngine::_audioIDInfoMap;
-AudioEngineImpl* AudioEngine::_audioEngineImpl = nullptr;
+AudioEngineImplInterface* AudioEngine::_audioEngineImpl = nullptr;
 
-AudioEngine::AudioEngineThreadPool* AudioEngine::s_threadPool = nullptr;
+AudioEngine::AudioEngineThreadPool* AudioEngine::s_threadPool = nullptr; 
+int AudioEngine::_currentAudioID = 0;
 
 class AudioEngine::AudioEngineThreadPool
 {
 public:
-    AudioEngineThreadPool(bool detach, int threads = 4)
-        : _detach(detach)
-        , _stop(false)
+    AudioEngineThreadPool(int threads = 4)
+        : _stop(false)
     {
         for (int index = 0; index < threads; ++index)
         {
             _workers.emplace_back(std::thread(std::bind(&AudioEngineThreadPool::threadFunc, this)));
-            if (_detach)
-            {
-                _workers[index].detach();
-            }
         }
     }
 
@@ -101,11 +99,8 @@ public:
             _taskCondition.notify_all();
         }
 
-        if (!_detach)
-        {
-            for (auto&& worker : _workers) {
-                worker.join();
-            }
+        for (auto&& worker : _workers) {
+            worker.join();
         }
     }
 
@@ -141,7 +136,6 @@ private:
 
     std::mutex _queueMutex;
     std::condition_variable _taskCondition;
-    bool _detach;
     bool _stop;
 };
 
@@ -165,6 +159,7 @@ bool AudioEngine::lazyInit()
     if (_audioEngineImpl == nullptr)
     {
         _audioEngineImpl = new (std::nothrow) AudioEngineImpl();
+        _currentAudioID = 0;
         if(!_audioEngineImpl ||  !_audioEngineImpl->init() ){
             delete _audioEngineImpl;
             _audioEngineImpl = nullptr;
@@ -172,15 +167,10 @@ bool AudioEngine::lazyInit()
         }
     }
 
-#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+#if CC_TARGET_PLATFORM != CC_PLATFORM_ANDROID
     if (_audioEngineImpl && s_threadPool == nullptr)
     {
-        s_threadPool = new (std::nothrow) AudioEngineThreadPool(true);
-    }
-#elif CC_TARGET_PLATFORM != CC_PLATFORM_ANDROID
-    if (_audioEngineImpl && s_threadPool == nullptr)
-    {
-        s_threadPool = new (std::nothrow) AudioEngineThreadPool(false);
+        s_threadPool = new (std::nothrow) AudioEngineThreadPool();
     }
 #endif
 
@@ -249,6 +239,7 @@ int AudioEngine::play2d(const std::string& filePath, bool loop, float volume, co
                 profileHelper->audioIDs.push_back(ret);
             }
             audioRef.profileHelper = profileHelper;
+            _currentAudioID = ret + 1;
         }
     } while (0);
 
@@ -438,6 +429,7 @@ void AudioEngine::setFinishCallback(int audioID, const std::function<void (int, 
 {
     auto it = _audioIDInfoMap.find(audioID);
     if (it != _audioIDInfoMap.end()){
+        it->second.finishCallback = callback;
         _audioEngineImpl->setFinishCallback(audioID, callback);
     }
 }
@@ -534,6 +526,43 @@ void AudioEngine::preload(const std::string& filePath, std::function<void(bool i
 
         _audioEngineImpl->preload(filePath, callback);
     }
+}
+
+void experimental::AudioEngine::surrenderAudio()
+{
+    for (auto& it : _audioIDInfoMap)
+    {
+        getDuration(it.first);
+        it.second.currentTime = _audioEngineImpl->getCurrentTime(it.first);
+    }
+    end();
+    _audioEngineImpl = new AudioEngineImplNull(_currentAudioID);
+}
+
+bool experimental::AudioEngine::reacquireAudio()
+{
+    delete _audioEngineImpl;
+    _audioEngineImpl = nullptr;
+    if (!lazyInit())
+      return false;
+
+    std::vector<int> keys;
+    keys.reserve(_audioIDInfoMap.size());
+    for (auto& it : _audioIDInfoMap)
+    {
+        keys.push_back(it.first);
+    }
+    std::sort(keys.begin(), keys.end());
+    for (auto& it : keys) {
+        auto& info = _audioIDInfoMap[it];
+        int audioId = _audioEngineImpl->play2d(*info.filePath, info.loop, info.volume, it);
+        if (info.state == AudioState::PAUSED)
+            _audioEngineImpl->pause(audioId);
+        _currentAudioID = audioId + 1;
+        _audioEngineImpl->setFinishCallback(audioId, info.finishCallback);
+        experimental::AudioEngine::setCurrentTime(audioId, info.currentTime);
+    }
+    return true;
 }
 
 void AudioEngine::addTask(const std::function<void()>& task)

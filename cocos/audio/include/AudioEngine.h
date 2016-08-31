@@ -33,6 +33,7 @@
 #include <unordered_map>
 
 #include "platform/CCPlatformMacros.h"
+#include "audio/AudioEngineImplInterface.h"
 #include "audio/include/Export.h"
 
 #ifdef ERROR
@@ -78,7 +79,7 @@ public:
 };
 
 class AudioEngineImpl;
-
+class AudioEngineImplNull;
 /**
  * @class AudioEngine
  *
@@ -127,6 +128,7 @@ public:
      * @param loop Whether audio instance loop or not.
      * @param volume Volume value (range from 0.0 to 1.0).
      * @param profile A profile for audio instance. When profile is not specified, default profile will be used.
+     * @param audioId Force the audio ID returned if different from INVALID_AUDIO_ID and greater than the last audio ID returned by play2d.
      * @return An audio ID. It allows you to dynamically change the behavior of an audio instance on the fly.
      *
      * @see `AudioProfile`
@@ -293,6 +295,18 @@ public:
      */
     static void preload(const std::string& filePath, std::function<void(bool isSuccess)> callback);
 
+    /**
+     * Surrender the audio system.
+     * Unload the current audio engine implementation, and continue advancing audio file positions as if they were played.
+     */
+    static void surrenderAudio();
+    
+    /**
+     * Reacquire the audio system.
+     * Reload the audio engine implementation, and restart all audio files at the correct position.
+     */
+    static bool reacquireAudio();
+
 protected:
     static void addTask(const std::function<void()>& task);
     static void remove(int audioID);
@@ -321,11 +335,15 @@ protected:
         bool loop;
         float duration;
         AudioState state;
+        float currentTime;
+        std::function<void(int, const std::string &)> finishCallback;
 
         AudioInfo()
             : profileHelper(nullptr)
             , duration(TIME_UNKNOWN)
             , state(AudioState::INITIALZING)
+            , currentTime(0)
+            , finishCallback(nullptr)
         {
 
         }
@@ -344,12 +362,15 @@ protected:
     
     static ProfileHelper* _defaultProfileHelper;
     
-    static AudioEngineImpl* _audioEngineImpl;
+    static AudioEngineImplInterface* _audioEngineImpl;
 
     class AudioEngineThreadPool;
     static AudioEngineThreadPool* s_threadPool;
+
+    static int _currentAudioID;
     
     friend class AudioEngineImpl;
+    friend class AudioEngineImplNull;
 };
 
 }

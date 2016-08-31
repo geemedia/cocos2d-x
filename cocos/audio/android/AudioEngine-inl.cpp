@@ -91,7 +91,7 @@ AudioPlayer::~AudioPlayer()
     }
 }
 
-bool AudioPlayer::init(SLEngineItf engineEngine, SLObjectItf outputMixObject,const std::string& fileFullPath, float volume, bool loop)
+bool AudioPlayer::init(SLEngineItf engineEngine, SLObjectItf outputMixObject, const std::string& fileFullPath, float volume, bool loop)
 {
     bool ret = false;
 
@@ -242,7 +242,7 @@ bool AudioEngineImpl::init()
     return ret;
 }
 
-int AudioEngineImpl::play2d(const std::string &filePath ,bool loop ,float volume)
+int AudioEngineImpl::play2d(const std::string& filePath, bool loop, float volume, int /*audioID*/)
 {
     auto audioId = AudioEngine::INVALID_AUDIO_ID;
 
@@ -317,7 +317,7 @@ void AudioEngineImpl::update(float dt)
     }
 }
 
-void AudioEngineImpl::setVolume(int audioID,float volume)
+void AudioEngineImpl::setVolume(int audioID, float volume)
 {
     auto& player = _audioPlayers[audioID];
     int dbVolume = 2000 * log10(volume);

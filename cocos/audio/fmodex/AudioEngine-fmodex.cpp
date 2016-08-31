@@ -1,7 +1,9 @@
 #ifdef CC_USE_FMOD_EX
 #include "AudioEngine-fmodex.h"
 #include <cstring>
+#if CC_TARGET_PLATFORM != CC_PLATFORM_WIN32
 #include <unistd.h>
+#endif
 #include <unordered_map>
 #include <fmod_errors.h>
 #include "audio/include/AudioEngine.h"
@@ -55,6 +57,11 @@ AudioEngineImpl::AudioEngineImpl()
 
 AudioEngineImpl::~AudioEngineImpl()
 {
+    if (!_lazyInitLoop)
+    {
+        auto scheduler = cocos2d::Director::getInstance()->getScheduler();
+        scheduler->unschedule(schedule_selector(AudioEngineImpl::update), this);
+    }
     ERRCHECKWITHEXIT(_fmodSystem->close());
     ERRCHECKWITHEXIT(_fmodSystem->release());
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
@@ -84,9 +91,6 @@ bool AudioEngineImpl::init()
         _channelInfoMap.clear();
         _soundMap.clear();
 
-        auto scheduler = cocos2d::Director::getInstance()->getScheduler();
-        scheduler->schedule(schedule_selector(AudioEngineImpl::update), this, 0.05f, false);
-
         g_AudioEngineImpl = this;
         success = true;
     } while (0); 
@@ -94,9 +98,12 @@ bool AudioEngineImpl::init()
     return success;
 }
 
-int AudioEngineImpl::play2d(const std::string &fileFullPath, bool loop, float volume)
+int AudioEngineImpl::play2d(const std::string& fileFullPath, bool loop, float volume, int audioID)
 {
-    int audioID = preload(fileFullPath, nullptr);
+    if (audioID != AudioEngine::INVALID_AUDIO_ID && audioID > _currentAudioID)
+        _currentAudioID = audioID;
+      
+    audioID = _preload(fileFullPath, nullptr);
     if (audioID != AudioEngine::INVALID_AUDIO_ID) {
         _channelInfoMap[audioID].loop = loop;
         _channelInfoMap[audioID].channel->setPaused(true);
@@ -113,24 +120,33 @@ int AudioEngineImpl::play2d(const std::string &fileFullPath, bool loop, float vo
         }
 
         return audioID;
-    }
-    else {
+    } else {
         CCLOG("AudioEngineImpl::play2d -  Couldn't play sound from %s ", fileFullPath.c_str());
         return AudioEngine::INVALID_AUDIO_ID;
     }
 }
 
-int AudioEngineImpl::preload(const std::string& filePath, std::function<void(bool isSuccess)> callback)
+void AudioEngineImpl::preload(const std::string& filePath, std::function<void(bool isSuccess)> callback)
+{
+    _preload(filePath, callback);
+}
+
+int AudioEngineImpl::_preload(const std::string& filePath, std::function<void(bool isSuccess)> callback)
 {
     FMOD::Sound* sound = findSound(filePath);
     if (sound == nullptr) {
+#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
+        std::string fullPath = FileUtils::getInstance()->fullPathForFilename(filePath);
+        FMOD_RESULT result = _fmodSystem->createSound(fullPath.c_str(), FMOD_LOOP_OFF, nullptr, &sound);
+#else
         Data soundData = FileUtils::getInstance()->getDataFromFile(filePath);
         FMOD_CREATESOUNDEXINFO exinfo;
         memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
         exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-        exinfo.length = static_cast<int>(soundData.getSize());
+        exinfo.length = static_cast<unsigned int>(soundData.getSize());
         FMOD_MODE mode = FMOD_HARDWARE | FMOD_OPENMEMORY | FMOD_LOOP_OFF;
-        FMOD_RESULT result = _fmodSystem->createSound(reinterpret_cast<const char*>(soundData.getBytes()), mode, &exinfo, &sound);
+        FMOD_RESULT result = _fmodSystem->createSound(reinterpret_cast<char*>(soundData.getBytes()), mode, &exinfo, &sound);
+#endif
         if (ERRCHECK(result)) {
             CCLOG("Sound effect in %s could not be preloaded\n", filePath.c_str());
             if (callback) {
@@ -160,8 +176,7 @@ void AudioEngineImpl::setVolume(int audioID, float volume)
 {
     if (_channelInfoMap.find(audioID) != _channelInfoMap.end()) {
         ERRCHECK(_channelInfoMap[audioID].channel->setVolume(volume));
-    } 
-    else {
+    } else {
         CCLOG("AudioEngineImpl::setVolume: invalid audioID: %d\n", audioID);
     }
 }
@@ -170,8 +185,7 @@ void AudioEngineImpl::setLoop(int audioID, bool loop)
 {
     if (_channelInfoMap.find(audioID) != _channelInfoMap.end()) {
         _channelInfoMap[audioID].channel->setLoopCount(loop ? -1 : 0);
-    }
-    else {
+    } else {
         CCLOG("AudioEngineImpl::setLoop: invalid audioID: %d\n", audioID);
     }
 }
@@ -182,8 +196,7 @@ bool AudioEngineImpl::pause(int audioID)
         _channelInfoMap[audioID].channel->setPaused(true);
         AudioEngine::_audioIDInfoMap[audioID].state = AudioEngine::AudioState::PAUSED;
         return true;
-    }
-    else {
+    } else {
         CCLOG("AudioEngineImpl::pause: invalid audioID: %d\n", audioID);
         return false;
     }
@@ -210,8 +223,7 @@ bool AudioEngineImpl::resume(int audioID)
         AudioEngine::_audioIDInfoMap[audioID].state = AudioEngine::AudioState::PLAYING;
 
         return true;
-    }
-    else {
+    } else {
         CCLOG("AudioEngineImpl::resume: invalid audioID: %d\n", audioID);
         return false;
     }
@@ -224,8 +236,7 @@ bool AudioEngineImpl::stop(int audioID)
         it->second.channel->stop();
         it->second.channel = nullptr;
         return true;
-    }
-    else {      
+    } else {      
         CCLOG("AudioEngineImpl::stop: invalid audioID: %d\n", audioID);
         return false;
     }
@@ -245,8 +256,7 @@ float AudioEngineImpl::getDuration(int audioID){
         ERRCHECK(sound->getLength(&length, FMOD_TIMEUNIT_MS));
         float duration = (float)length / 1000.0f; 
         return duration;
-    }
-    else {
+    } else {
         CCLOG("AudioEngineImpl::getDuration: invalid audioID: %d\n", audioID);
         return AudioEngine::TIME_UNKNOWN;
     }
@@ -258,8 +268,7 @@ float AudioEngineImpl::getCurrentTime(int audioID) {
         ERRCHECK(_channelInfoMap[audioID].channel->getPosition(&position, FMOD_TIMEUNIT_MS));
         float currenttime = position /1000.0f;
         return currenttime; 
-    }
-    else {
+    } else {
         CCLOG("AudioEngineImpl::getCurrentTime: invalid audioID: %d\n", audioID);
         return AudioEngine::TIME_UNKNOWN;
     }
@@ -270,8 +279,7 @@ bool AudioEngineImpl::setCurrentTime(int audioID, float time) {
         unsigned int position = static_cast<unsigned int>(time * 1000.0f);
         ERRCHECK(_channelInfoMap[audioID].channel->setPosition(position, FMOD_TIMEUNIT_MS));
         return true;
-    } 
-    else {
+    } else {
         CCLOG("AudioEngineImpl::setCurrentTime: invalid audioID: %d\n", audioID);
         return false;
     }
@@ -283,8 +291,7 @@ void AudioEngineImpl::setFinishCallback(int audioID, const std::function<void(in
         FMOD::Channel* channel = _channelInfoMap[audioID].channel;
         _channelInfoMap[audioID].callback = callback;
         ERRCHECK(channel->setCallback(channelCallback));
-    } 
-    else {
+    } else {
         CCLOG("AudioEngineImpl::setFinishCallback: invalid audioID: %d\n", audioID);
     }
 }
@@ -313,8 +320,7 @@ void AudioEngineImpl::onSoundFinished(FMOD::Channel* channel)
         } else {
             CCLOG("AudioEngineImpl::onSoundFinished: invalid audioID: %d\n", audioID);
         }
-    } 
-    else {
+    } else {
         CCLOG("AudioEngineImpl::onSoundFinished: invalid channel\n");
     }
 }
