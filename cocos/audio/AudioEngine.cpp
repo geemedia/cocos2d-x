@@ -540,10 +540,15 @@ void experimental::AudioEngine::surrenderAudio()
     }
     
     // move content of _audioIDInfoMap and _audioPathIDMap into _audioIDInfoMapSurrendered and _audioPathIDMapSurrendered respectively
-    std::move(_audioIDInfoMap.begin(), _audioIDInfoMap.end(), std::inserter(_audioIDInfoMapSurrendered, _audioIDInfoMapSurrendered.begin()));
     std::move(_audioPathIDMap.begin(), _audioPathIDMap.end(), std::inserter(_audioPathIDMapSurrendered, _audioPathIDMapSurrendered.begin()));
-    _audioIDInfoMap.clear();
+    std::move(_audioIDInfoMap.begin(), _audioIDInfoMap.end(), std::inserter(_audioIDInfoMapSurrendered, _audioIDInfoMapSurrendered.begin()));
+    for (auto& itPairs : _audioPathIDMapSurrendered) {
+      for (auto& it : itPairs.second) {
+        _audioIDInfoMapSurrendered[it].filePath = &itPairs.first;  // keys are not moved so we must set the correct path pointer
+      }
+    }
     _audioPathIDMap.clear();
+    _audioIDInfoMap.clear();
     end();
     _isAudioSurrendered = true;
 }
@@ -558,10 +563,15 @@ bool experimental::AudioEngine::reacquireAudio()
     }
       
     // move back content of _audioIDInfoMapSurrendered and _audioPathIDMapSurrendered into _audioIDInfoMap and _audioPathIDMap respectively
-    std::move(_audioIDInfoMapSurrendered.begin(), _audioIDInfoMapSurrendered.end(), std::inserter(_audioIDInfoMap, _audioIDInfoMap.begin()));
     std::move(_audioPathIDMapSurrendered.begin(), _audioPathIDMapSurrendered.end(), std::inserter(_audioPathIDMap, _audioPathIDMap.begin()));
-    _audioIDInfoMapSurrendered.clear();
+    std::move(_audioIDInfoMapSurrendered.begin(), _audioIDInfoMapSurrendered.end(), std::inserter(_audioIDInfoMap, _audioIDInfoMap.begin()));
+    for (auto& itPairs : _audioPathIDMap) {
+      for (auto& it : itPairs.second) {
+        _audioIDInfoMap[it].filePath = &itPairs.first;  // keys are not moved so we must set the correct path pointer
+      }
+    }
     _audioPathIDMapSurrendered.clear();
+    _audioIDInfoMapSurrendered.clear();
 
     std::vector<int> keys;
     keys.reserve(_audioIDInfoMap.size());
