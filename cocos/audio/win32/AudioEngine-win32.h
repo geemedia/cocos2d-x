@@ -31,7 +31,6 @@
 #include <unordered_map>
 
 #include "base/CCRef.h"
-#include "audio/AudioEngineImplInterface.h"
 #include "audio/win32/AudioCache.h"
 #include "audio/win32/AudioPlayer.h"
 
@@ -39,34 +38,33 @@ NS_CC_BEGIN
     namespace experimental{
 #define MAX_AUDIOINSTANCES 32
 
-class CC_DLL AudioEngineImpl : public AudioEngineImplInterface
+class CC_DLL AudioEngineImpl : public cocos2d::Ref
 {
 public:
     AudioEngineImpl();
     ~AudioEngineImpl();
     
-    bool init() override;
-    int play2d(const std::string& fileFullPath, bool loop, float volume, int audioID) override;
-    void setVolume(int audioID, float volume) override;
-    void setLoop(int audioID, bool loop) override;
-    bool pause(int audioID) override;
-    bool resume(int audioID) override;
-    bool stop(int audioID) override;
-    void stopAll() override;
-    float getDuration(int audioID) override;
-    float getCurrentTime(int audioID) override;
-    bool setCurrentTime(int audioID, float time) override;
-    void setFinishCallback(int audioID, const std::function<void (int, const std::string &)>& callback) override;
+    bool init();
+    int play2d(const std::string& fileFullPath, bool loop, float volume, int audioID);
+    void setVolume(int audioID, float volume);
+    void setLoop(int audioID, bool loop);
+    bool pause(int audioID);
+    bool resume(int audioID);
+    bool stop(int audioID);
+    void stopAll();
+    float getDuration(int audioID);
+    float getCurrentTime(int audioID);
+    bool setCurrentTime(int audioID, float time);
+    void setFinishCallback(int audioID, const std::function<void (int, const std::string &)>& callback);
     
-    void uncache(const std::string& filePath) override;
-    void uncacheAll() override;
-    void preload(const std::string& filePath, std::function<void(bool)> callback) override;
+    void uncache(const std::string& filePath);
+    void uncacheAll();
+    AudioCache* preload(const std::string& filePath, std::function<void(bool)> callback);
     
     void update(float dt);
     
 private:
     void _play2d(AudioCache* cache, int audioID);
-    AudioCache* _preload(const std::string& filePath, std::function<void(bool)> callback);
     
     ALuint _alSources[MAX_AUDIOINSTANCES];
     

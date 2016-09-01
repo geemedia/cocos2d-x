@@ -1,7 +1,6 @@
 
 set(COCOS_AUDIO_SRC
     audio/AudioEngine.cpp
-    audio/null/AudioEngineImplNull.cpp
     )
 
 if(WINDOWS)

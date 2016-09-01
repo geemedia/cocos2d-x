@@ -26,13 +26,12 @@
 
 #include "audio/include/AudioEngine.h"
 #include <condition_variable>
+#include <iterator>
 #include <queue>
 #include "platform/CCFileUtils.h"
-#include "base/CCDirector.h"
-#include "base/CCScheduler.h"
 #include "base/ccUtils.h"
 
-#include "audio/null/AudioEngineImplNull.h"
+
 #if CC_USE_FMOD_EX
 #include "audio/fmodex/AudioEngine-fmodex.h"
 #elif CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
@@ -68,10 +67,13 @@ std::unordered_map<std::string, AudioEngine::ProfileHelper> AudioEngine::_audioP
 unsigned int AudioEngine::_maxInstances = MAX_AUDIOINSTANCES;
 AudioEngine::ProfileHelper* AudioEngine::_defaultProfileHelper = nullptr;
 std::unordered_map<int, AudioEngine::AudioInfo> AudioEngine::_audioIDInfoMap;
-AudioEngineImplInterface* AudioEngine::_audioEngineImpl = nullptr;
+AudioEngineImpl* AudioEngine::_audioEngineImpl = nullptr;
 
-AudioEngine::AudioEngineThreadPool* AudioEngine::s_threadPool = nullptr; 
-int AudioEngine::_currentAudioID = 0;
+AudioEngine::AudioEngineThreadPool* AudioEngine::s_threadPool = nullptr;
+
+bool AudioEngine::_isAudioSurrendered = false;
+std::unordered_map<int, AudioEngine::AudioInfo> AudioEngine::_audioIDInfoMapSurrendered;
+std::unordered_map<std::string,std::list<int>> AudioEngine::_audioPathIDMapSurrendered;
 
 class AudioEngine::AudioEngineThreadPool
 {
@@ -156,10 +158,12 @@ void AudioEngine::end()
 
 bool AudioEngine::lazyInit()
 {
+    if (_isAudioSurrendered)
+        return false;
+    
     if (_audioEngineImpl == nullptr)
     {
         _audioEngineImpl = new (std::nothrow) AudioEngineImpl();
-        _currentAudioID = 0;
         if(!_audioEngineImpl ||  !_audioEngineImpl->init() ){
             delete _audioEngineImpl;
             _audioEngineImpl = nullptr;
@@ -223,7 +227,7 @@ int AudioEngine::play2d(const std::string& filePath, bool loop, float volume, co
             volume = 1.0f;
         }
         
-        ret = _audioEngineImpl->play2d(filePath, loop, volume);
+        ret = _audioEngineImpl->play2d(filePath, loop, volume, AudioEngine::INVALID_AUDIO_ID);
         if (ret != INVALID_AUDIO_ID)
         {
             _audioPathIDMap[filePath].push_back(ret);
@@ -239,7 +243,6 @@ int AudioEngine::play2d(const std::string& filePath, bool loop, float volume, co
                 profileHelper->audioIDs.push_back(ret);
             }
             audioRef.profileHelper = profileHelper;
-            _currentAudioID = ret + 1;
         }
     } while (0);
 
@@ -535,16 +538,30 @@ void experimental::AudioEngine::surrenderAudio()
         getDuration(it.first);
         it.second.currentTime = _audioEngineImpl->getCurrentTime(it.first);
     }
+    
+    // move content of _audioIDInfoMap and _audioPathIDMap into _audioIDInfoMapSurrendered and _audioPathIDMapSurrendered respectively
+    std::move(_audioIDInfoMap.begin(), _audioIDInfoMap.end(), std::inserter(_audioIDInfoMapSurrendered, _audioIDInfoMapSurrendered.begin()));
+    std::move(_audioPathIDMap.begin(), _audioPathIDMap.end(), std::inserter(_audioPathIDMapSurrendered, _audioPathIDMapSurrendered.begin()));
+    _audioIDInfoMap.clear();
+    _audioPathIDMap.clear();
     end();
-    _audioEngineImpl = new AudioEngineImplNull(_currentAudioID);
+    _isAudioSurrendered = true;
 }
 
 bool experimental::AudioEngine::reacquireAudio()
 {
-    delete _audioEngineImpl;
-    _audioEngineImpl = nullptr;
+    _isAudioSurrendered = false;
     if (!lazyInit())
-      return false;
+    {
+        _isAudioSurrendered = true;
+        return false;
+    }
+      
+    // move back content of _audioIDInfoMapSurrendered and _audioPathIDMapSurrendered into _audioIDInfoMap and _audioPathIDMap respectively
+    std::move(_audioIDInfoMapSurrendered.begin(), _audioIDInfoMapSurrendered.end(), std::inserter(_audioIDInfoMap, _audioIDInfoMap.begin()));
+    std::move(_audioPathIDMapSurrendered.begin(), _audioPathIDMapSurrendered.end(), std::inserter(_audioPathIDMap, _audioPathIDMap.begin()));
+    _audioIDInfoMapSurrendered.clear();
+    _audioPathIDMapSurrendered.clear();
 
     std::vector<int> keys;
     keys.reserve(_audioIDInfoMap.size());
@@ -553,12 +570,12 @@ bool experimental::AudioEngine::reacquireAudio()
         keys.push_back(it.first);
     }
     std::sort(keys.begin(), keys.end());
-    for (auto& it : keys) {
+    for (auto& it : keys)
+    {
         auto& info = _audioIDInfoMap[it];
         int audioId = _audioEngineImpl->play2d(*info.filePath, info.loop, info.volume, it);
         if (info.state == AudioState::PAUSED)
             _audioEngineImpl->pause(audioId);
-        _currentAudioID = audioId + 1;
         _audioEngineImpl->setFinishCallback(audioId, info.finishCallback);
         experimental::AudioEngine::setCurrentTime(audioId, info.currentTime);
     }

@@ -28,7 +28,6 @@
 #include <unordered_map>
 
 #include "base/CCRef.h"
-#include "audio/AudioEngineImplInterface.h"
 #include "audio/include/AudioEngine.h"
 #include "audio/winrt/AudioCachePlayer.h"
 
@@ -36,14 +35,14 @@ NS_CC_BEGIN
     namespace experimental{
 #define MAX_AUDIOINSTANCES 32
 
- class CC_DLL AudioEngineImpl : public AudioEngineImplInterface
+ class CC_DLL AudioEngineImpl : public cocos2d::Ref
  {
  public:
      AudioEngineImpl();
      ~AudioEngineImpl();
 
      bool init();
-     int play2d(const std::string &fileFullPath, bool loop, float volume, int audioId);
+     int play2d(const std::string& fileFullPath, bool loop, float volume, int audioId);
      void setVolume(int audioID, float volume);
      void setLoop(int audioID, bool loop);
      bool pause(int audioID);
@@ -53,15 +52,14 @@ NS_CC_BEGIN
      float getDuration(int audioID);
      float getCurrentTime(int audioID);
      bool setCurrentTime(int audioID, float time);
-     void setFinishCallback(int audioID, const std::function<void(int, const std::string &)> &callback);
+     void setFinishCallback(int audioID, const std::function<void(int, const std::string &)>& callback);
      void uncache(const std::string& filePath);
      void uncacheAll();
-     void preload(const std::string& filePath, std::function<void(bool)> callback);
+     AudioCache* preload(const std::string& filePath, std::function<void(bool)> callback);
      void update(float dt);
 
  private:
      void _play2d(AudioCache *cache, int audioID);
-     AudioCache* _preload(const std::string& filePath, std::function<void(bool)> callback);
 
  private:
      std::unordered_map<int, AudioPlayer>  _audioPlayers;
