@@ -103,7 +103,7 @@ int AudioEngineImpl::play2d(const std::string& fileFullPath, bool loop, float vo
     if (audioID != AudioEngine::INVALID_AUDIO_ID && audioID > _currentAudioID)
         _currentAudioID = audioID;
       
-    audioID = _preload(fileFullPath, nullptr);
+    audioID = preload(fileFullPath, nullptr);
     if (audioID != AudioEngine::INVALID_AUDIO_ID) {
         _channelInfoMap[audioID].loop = loop;
         _channelInfoMap[audioID].channel->setPaused(true);
@@ -126,12 +126,7 @@ int AudioEngineImpl::play2d(const std::string& fileFullPath, bool loop, float vo
     }
 }
 
-void AudioEngineImpl::preload(const std::string& filePath, std::function<void(bool isSuccess)> callback)
-{
-    _preload(filePath, callback);
-}
-
-int AudioEngineImpl::_preload(const std::string& filePath, std::function<void(bool isSuccess)> callback)
+int AudioEngineImpl::preload(const std::string& filePath, std::function<void(bool isSuccess)> callback)
 {
     FMOD::Sound* sound = findSound(filePath);
     if (sound == nullptr) {

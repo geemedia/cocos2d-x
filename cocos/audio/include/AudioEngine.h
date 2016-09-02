@@ -33,7 +33,6 @@
 #include <unordered_map>
 
 #include "platform/CCPlatformMacros.h"
-#include "audio/AudioEngineImplInterface.h"
 #include "audio/include/Export.h"
 
 #ifdef ERROR
@@ -79,7 +78,7 @@ public:
 };
 
 class AudioEngineImpl;
-class AudioEngineImplNull;
+
 /**
  * @class AudioEngine
  *
@@ -128,7 +127,6 @@ public:
      * @param loop Whether audio instance loop or not.
      * @param volume Volume value (range from 0.0 to 1.0).
      * @param profile A profile for audio instance. When profile is not specified, default profile will be used.
-     * @param audioId Force the audio ID returned if different from INVALID_AUDIO_ID and greater than the last audio ID returned by play2d.
      * @return An audio ID. It allows you to dynamically change the behavior of an audio instance on the fly.
      *
      * @see `AudioProfile`
@@ -297,13 +295,14 @@ public:
 
     /**
      * Surrender the audio system.
-     * Unload the current audio engine implementation, and continue advancing audio file positions as if they were played.
+     * Pause all sounds and unload the current audio engine implementation.
+     * No sound can be played/modified while the audio is surrendered.
      */
     static void surrenderAudio();
     
     /**
      * Reacquire the audio system.
-     * Reload the audio engine implementation, and restart all audio files at the correct position.
+     * Reload the audio engine implementation, and resumes all audio files paused by surrenderAudio.
      */
     static bool reacquireAudio();
 
@@ -362,15 +361,16 @@ protected:
     
     static ProfileHelper* _defaultProfileHelper;
     
-    static AudioEngineImplInterface* _audioEngineImpl;
+    static AudioEngineImpl* _audioEngineImpl;
 
     class AudioEngineThreadPool;
     static AudioEngineThreadPool* s_threadPool;
 
-    static int _currentAudioID;
+    static bool _isAudioSurrendered;
+    static std::unordered_map<int, AudioInfo> _audioIDInfoMapSurrendered;
+    static std::unordered_map<std::string,std::list<int>> _audioPathIDMapSurrendered;
     
     friend class AudioEngineImpl;
-    friend class AudioEngineImplNull;
 };
 
 }

@@ -400,7 +400,6 @@ xcopy /Y /Q "$(ProjectDir)..\..\external\chipmunk\prebuilt\win32\release-lib\*.*
     <ClCompile Include="..\3d\CCTerrain.cpp" />
     <ClCompile Include="..\audio\AudioEngine.cpp" />
     <ClCompile Include="..\audio\fmodex\AudioEngine-fmodex.cpp" />
-    <ClCompile Include="..\audio\null\AudioEngineImplNull.cpp" />
     <ClCompile Include="..\audio\win32\AudioCache.cpp" />
     <ClCompile Include="..\audio\win32\AudioPlayer.cpp" />
     <ClCompile Include="..\audio\win32\MciPlayer.cpp" />
@@ -973,12 +972,10 @@ xcopy /Y /Q "$(ProjectDir)..\..\external\chipmunk\prebuilt\win32\release-lib\*.*
     <ClInclude Include="..\3d\CCSprite3DMaterial.h" />
     <ClInclude Include="..\3d\CCTerrain.h" />
     <ClInclude Include="..\3d\cocos3d.h" />
-    <ClInclude Include="..\audio\AudioEngineImplInterface.h" />
     <ClInclude Include="..\audio\fmodex\AudioEngine-fmodex.h" />
     <ClInclude Include="..\audio\include\AudioEngine.h" />
     <ClInclude Include="..\audio\include\Export.h" />
     <ClInclude Include="..\audio\include\SimpleAudioEngine.h" />
-    <ClInclude Include="..\audio\null\AudioEngineImplNull.h" />
     <ClInclude Include="..\audio\win32\AudioCache.h" />
     <ClInclude Include="..\audio\win32\AudioPlayer.h" />
     <ClInclude Include="..\audio\win32\MciPlayer.h" />
