@@ -119,7 +119,21 @@ public:
      * @return the scroll bar's auto hide time
      */
     float getAutoHideTime() const { return _autoHideTime; }
-    
+
+    /**
+    * @brief Set scroll bar delay before it auto hides
+    *
+    * @param scroll bar auto hide delay
+    */
+    void setAutoHideDelay(float autoHideDelay) { _autoHideDelay = autoHideDelay; }
+
+    /**
+    * @brief Get the scroll bar's auto hide delay
+    *
+    * @return the scroll bar's auto hide delay
+    */
+    float getAutoHideDelay() const { return _autoHideDelay; }
+
     /**
      * @brief This is called by parent ScrollView when the parent is scrolled. Don't call this directly.
      *
@@ -171,6 +185,7 @@ private:
     
     bool _autoHideEnabled;
     float _autoHideTime;
+    float _autoHideDelay;
     float _autoHideRemainingTime;
     
 };

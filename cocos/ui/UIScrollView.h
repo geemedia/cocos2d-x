@@ -511,7 +511,21 @@ public:
      * @return the scroll bar's auto hide time
      */
     float getScrollBarAutoHideTime() const;
-    
+
+    /**
+    * @brief Set scroll bar delay before auto hide
+    *
+    * @param scroll bar auto hide delay
+    */
+    void setScrollBarAutoHideDelay(float autoHideDelay);
+
+    /**
+    * @brief Get the scroll bar's auto hide delay
+    *
+    * @return the scroll bar's auto hide delay
+    */
+    float getScrollBarAutoHideDelay() const;
+
     /**
      * @brief Set the touch total time threshold
      *
