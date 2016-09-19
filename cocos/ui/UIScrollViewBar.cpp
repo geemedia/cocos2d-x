@@ -51,6 +51,7 @@ _marginForLength(DEFAULT_MARGIN),
 _touching(false),
 _autoHideEnabled(true),
 _autoHideTime(DEFAULT_AUTO_HIDE_TIME),
+_autoHideDelay(0),
 _autoHideRemainingTime(0)
 {
     CCASSERT(parent != nullptr, "Parent scroll view must not be null!");
@@ -144,12 +145,16 @@ void ScrollViewBar::setWidth(float width)
 void ScrollViewBar::setAutoHideEnabled(bool autoHideEnabled)
 {
     _autoHideEnabled = autoHideEnabled;
-    if (!_autoHideEnabled && !_touching && _autoHideRemainingTime <= 0)
+    if (_autoHideEnabled)
     {
-        ProtectedNode::setOpacity(_opacity);
+        if (!_touching)
+            ProtectedNode::setOpacity(0);
     }
     else
-        ProtectedNode::setOpacity(0);
+    {
+        _autoHideRemainingTime = 0;
+        ProtectedNode::setOpacity(_opacity);
+    }
 }
 
 float ScrollViewBar::getWidth() const
@@ -185,7 +190,7 @@ void ScrollViewBar::update(float deltaTime)
     
 void ScrollViewBar::processAutoHide(float deltaTime)
 {
-   if(!_autoHideEnabled || _autoHideRemainingTime <= 0)
+    if(!_autoHideEnabled || _autoHideRemainingTime <= 0)
     {
         return;
     }
@@ -205,34 +210,34 @@ void ScrollViewBar::processAutoHide(float deltaTime)
 
 void ScrollViewBar::onTouchBegan()
 {
+    _touching = true;
     if(!_autoHideEnabled)
     {
         return;
     }
-    _touching = true;
 }
 
 void ScrollViewBar::onTouchEnded()
 {
+    _touching = false;
     if(!_autoHideEnabled)
     {
         return;
     }
-    _touching = false;
     
     if(_autoHideRemainingTime <= 0)
     {
         // If the remaining time is 0, it means that it didn't moved after touch started so scroll bar is not showing.
         return;
     }
-    _autoHideRemainingTime = _autoHideTime;
+    _autoHideRemainingTime = _autoHideTime + _autoHideDelay;
 }
 
 void ScrollViewBar::onScrolled(const Vec2& outOfBoundary)
 {
     if(_autoHideEnabled)
     {
-        _autoHideRemainingTime = _autoHideTime;
+        _autoHideRemainingTime = _autoHideTime + _autoHideDelay;
         ProtectedNode::setOpacity(_opacity);
     }
     

@@ -1342,7 +1342,34 @@ float ScrollView::getScrollBarAutoHideTime() const
     }
     return 0;
 }
-    
+
+void ScrollView::setScrollBarAutoHideDelay(float autoHideDelay)
+{
+    CCASSERT(_scrollBarEnabled, "Scroll bar should be enabled!");
+    if (_verticalScrollBar != nullptr)
+    {
+        _verticalScrollBar->setAutoHideDelay(autoHideDelay);
+    }
+    if (_horizontalScrollBar != nullptr)
+    {
+        _horizontalScrollBar->setAutoHideDelay(autoHideDelay);
+    }
+}
+
+float ScrollView::getScrollBarAutoHideDelay() const
+{
+    CCASSERT(_scrollBarEnabled, "Scroll bar should be enabled!");
+    if (_verticalScrollBar != nullptr)
+    {
+        return _verticalScrollBar->getAutoHideDelay();
+    }
+    else if (_horizontalScrollBar != nullptr)
+    {
+        return _horizontalScrollBar->getAutoHideDelay();
+    }
+    return 0;
+}
+
 void ScrollView::setTouchTotalTimeThreshold(float touchTotalTimeThreshold)
 {
     _touchTotalTimeThreshold = touchTotalTimeThreshold;
