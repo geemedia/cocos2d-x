@@ -256,7 +256,7 @@ class CocosZipInstaller(object):
         if os.path.exists(json_folder_path):
             shutil.rmtree(json_folder_path)
 
-        file_to_extract = os.path.join(folder_for_extracting, 'json.zip')
+        file_to_extract = os.path.join(folder_for_extracting, 'json_v1.1.zip')
         retrieve_prebuild('json/json', file_to_extract)
         self.unpack_zipfile(file_to_extract, folder_for_extracting)            
         os.remove(file_to_extract)
