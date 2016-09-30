@@ -251,6 +251,16 @@ class CocosZipInstaller(object):
         self.unpack_zipfile(file_to_extract, folder_for_extracting)            
         os.remove(file_to_extract)
 
+    def download_json_zip(self, workpath, folder_for_extracting):
+        json_folder_path = os.path.join(folder_for_extracting, 'json')
+        if os.path.exists(json_folder_path):
+            shutil.rmtree(json_folder_path)
+
+        file_to_extract = os.path.join(folder_for_extracting, 'json.zip')
+        retrieve_prebuild('json/json', file_to_extract)
+        self.unpack_zipfile(file_to_extract, folder_for_extracting)            
+        os.remove(file_to_extract)
+
     def run(self, workpath, folder_for_extracting, remove_downloaded, force_update, download_only, disable_download_android_fmod):
         if not disable_download_android_fmod:
             self.download_fmod_zip(workpath, folder_for_extracting)
@@ -282,6 +292,10 @@ class CocosZipInstaller(object):
                     if os.path.isfile(srcCopyFile):
                         dstCopyFile = os.path.join(workpath, self._copy_files[srcFile])
                         shutil.copyfile(srcCopyFile, dstCopyFile)
+            
+            # Delete original json folder and replace it with the latest version (1.1.0)
+            self.download_json_zip(workpath, folder_for_extracting)
+
             print("==> Cleaning...")
             if os.path.exists(self._extracted_folder_name):
                 shutil.rmtree(self._extracted_folder_name)
