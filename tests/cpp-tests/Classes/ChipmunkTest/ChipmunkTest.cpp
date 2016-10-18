@@ -4,8 +4,6 @@
 // http://www.cocos2d-x.org
 //
 
-#include "chipmunk/chipmunk.h"
-
 #include "ChipmunkTest.h"
 
 USING_NS_CC;
@@ -159,6 +157,7 @@ void ChipmunkTest::initPhysics()
 
 void ChipmunkTest::update(float delta)
 {
+#if CC_ENABLE_CHIPMUNK_INTEGRATION
     // Should use a fixed size step based on the animation interval.
     int steps = 2;
     float dt = Director::getInstance()->getAnimationInterval()/(float)steps;
@@ -171,6 +170,7 @@ void ChipmunkTest::update(float delta)
 		cpHastySpaceStep(_space, dt);
 #endif
     }
+#endif
 }
 
 void ChipmunkTest::createResetButton()
@@ -247,6 +247,7 @@ void ChipmunkTest::onTouchesEnded(const std::vector<Touch*>& touches, Event* eve
 
 void ChipmunkTest::onAcceleration(Acceleration* acc, Event* event)
 {
+#if CC_ENABLE_CHIPMUNK_INTEGRATION
     static float prevX=0, prevY=0;
 
 #define kFilterFactor 0.05f
@@ -260,6 +261,7 @@ void ChipmunkTest::onAcceleration(Acceleration* acc, Event* event)
     auto v = cocos2d::Vec2( accelX, accelY);
     v = v * 200;
     cpSpaceSetGravity(_space, cpv(v.x, v.y));
+#endif
 }
 
 ChipmunkTests::ChipmunkTests()

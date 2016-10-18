@@ -9,6 +9,12 @@
 #include "../testResource.h"
 #include "renderer/CCRenderer.h"
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_MAC || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX && !defined(GL_ES_VERSION_2_0)))
+#define CC_CLIPPING_NODE_OPENGLES 0
+#else
+#define CC_CLIPPING_NODE_OPENGLES 1
+#endif
+
 USING_NS_CC;
 
 enum {
@@ -756,7 +762,7 @@ void RawStencilBufferTest4::setupStencilForClippingOnPlane(GLint plane)
     RawStencilBufferTest::setupStencilForClippingOnPlane(plane);
     glDepthMask(GL_FALSE);
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
+#if (CC_CLIPPING_NODE_OPENGLES == 0)
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, _alphaThreshold);
 #else
@@ -769,7 +775,7 @@ void RawStencilBufferTest4::setupStencilForClippingOnPlane(GLint plane)
 
 void RawStencilBufferTest4::setupStencilForDrawingOnPlane(GLint plane)
 {
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
+#if (CC_CLIPPING_NODE_OPENGLES == 0)
     glDisable(GL_ALPHA_TEST);
 #endif
     glDepthMask(GL_TRUE);
@@ -789,7 +795,7 @@ void RawStencilBufferTest5::setupStencilForClippingOnPlane(GLint plane)
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
+#if (CC_CLIPPING_NODE_OPENGLES == 0)
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, _alphaThreshold);
 #else
@@ -802,7 +808,7 @@ void RawStencilBufferTest5::setupStencilForClippingOnPlane(GLint plane)
 
 void RawStencilBufferTest5::setupStencilForDrawingOnPlane(GLint plane)
 {
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
+#if (CC_CLIPPING_NODE_OPENGLES == 0)
     glDisable(GL_ALPHA_TEST);
 #endif
     glDepthMask(GL_TRUE);
@@ -820,7 +826,7 @@ std::string RawStencilBufferTest6::subtitle() const
 void RawStencilBufferTest6::setup()
 {
     RawStencilBufferTestAlphaTest::setup();
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
+#if (CC_CLIPPING_NODE_OPENGLES == 0)
     auto winPoint = Vec2(Director::getInstance()->getWinSize());
     //by default, glReadPixels will pack data with 4 bytes allignment
     unsigned char bits[4] = {0,0,0,0};
@@ -881,7 +887,7 @@ void RawStencilBufferTest6::setupStencilForClippingOnPlane(GLint plane)
     glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
+#if (CC_CLIPPING_NODE_OPENGLES == 0)
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, _alphaThreshold);
 #else
@@ -895,7 +901,7 @@ void RawStencilBufferTest6::setupStencilForClippingOnPlane(GLint plane)
 
 void RawStencilBufferTest6::setupStencilForDrawingOnPlane(GLint plane)
 {
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
+#if (CC_CLIPPING_NODE_OPENGLES == 0)
     glDisable(GL_ALPHA_TEST);
 #endif
     glDepthMask(GL_TRUE);

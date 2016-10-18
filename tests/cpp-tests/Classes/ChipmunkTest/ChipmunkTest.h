@@ -5,9 +5,12 @@
 #define __CHIPMUNKTEST_H__
 
 #include "cocos2d.h"
-#include "chipmunk/chipmunk.h"
 #include "../BaseTest.h"
+
+#if CC_ENABLE_CHIPMUNK_INTEGRATION
+#include "chipmunk/chipmunk.h"
 #include "extensions/cocos-ext.h"
+#endif
 
 class ChipmunkTest : public TestCase
 {
@@ -28,12 +31,12 @@ public:
     virtual void onAcceleration(cocos2d::Acceleration* acc, cocos2d::Event* event);
 
 private:
+#if CC_ENABLE_CHIPMUNK_INTEGRATION
     cocos2d::Texture2D* _spriteTexture; // weak ref
-#if CC_ENABLE_CHIPMUNK_INTEGRATION    
     cocos2d::extension::PhysicsDebugNode* _debugLayer; // weak ref
-#endif
     cpSpace* _space; // strong ref
     cpShape* _walls[4];
+#endif
 };
 
 DEFINE_TEST_SUITE(ChipmunkTests);
