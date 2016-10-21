@@ -212,13 +212,9 @@ if(LINUX OR MACOSX OR WINDOWS)
     cocos_find_package(OpenGL OPENGL REQUIRED)
 
     if(LINUX OR WINDOWS)
-      if(OPENGL1_ONLY)
-        add_definitions(-DCC_DISABLE_GL_FRAMEBUFFER_OBJECT=1 -DCC_OPENGL1_ONLY=1)
-      else()
-        cocos_find_package(GLEW GLEW REQUIRED)
-        #TODO: implement correct schema for pass cocos2d specific requirements to projects
-        include_directories(${GLEW_INCLUDE_DIRS})
-      endif()
+      cocos_find_package(GLEW GLEW REQUIRED)
+      #TODO: implement correct schema for pass cocos2d specific requirements to projects
+      include_directories(${GLEW_INCLUDE_DIRS})
     endif()
   endif()
 

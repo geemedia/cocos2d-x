@@ -77,7 +77,6 @@ RenderTexture::~RenderTexture()
     CC_SAFE_RELEASE(_sprite);
     CC_SAFE_RELEASE(_textureCopy);
     
-#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     glDeleteFramebuffers(1, &_FBO);
 
     if (_depthRenderBufffer)
@@ -89,7 +88,6 @@ RenderTexture::~RenderTexture()
     {
         glDeleteRenderbuffers(1, &_stencilRenderBufffer);
     }
-#endif
 
     CC_SAFE_DELETE(_UITextureImage);
 }
@@ -119,16 +117,14 @@ void RenderTexture::listenToBackground(EventCustom *event)
         CCLOG("Cache rendertexture failed!");
     }
     
-#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     glDeleteFramebuffers(1, &_FBO);
-#endif
     _FBO = 0;
 #endif
 }
 
 void RenderTexture::listenToForeground(EventCustom *event)
 {
-#if CC_ENABLE_CACHE_TEXTURE_DATA && !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
+#if CC_ENABLE_CACHE_TEXTURE_DATA
     // -- regenerate frame buffer object and attach the texture
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &_oldFBO);
     
@@ -193,15 +189,6 @@ bool RenderTexture::initWithWidthAndHeight(int w, int h, Texture2D::PixelFormat 
 
 bool RenderTexture::initWithWidthAndHeight(int w, int h, Texture2D::PixelFormat format, GLuint depthStencilFormat)
 {
-#if CC_DISABLE_GL_FRAMEBUFFER_OBJECT
-    CC_UNUSED_PARAM(w);
-    CC_UNUSED_PARAM(h);
-    CC_UNUSED_PARAM(format);
-    CC_UNUSED_PARAM(depthStencilFormat);
-
-    CCASSERT(0, "framebuffer unsupported");
-    return nullptr;
-#else
     CCASSERT(format != Texture2D::PixelFormat::A8, "only RGB and RGBA formats are valid for a render texture");
 
     bool ret = false;
@@ -359,7 +346,6 @@ bool RenderTexture::initWithWidthAndHeight(int w, int h, Texture2D::PixelFormat 
     CC_SAFE_FREE(data);
     
     return ret;
-#endif
 }
 
 void RenderTexture::setSprite(Sprite* sprite)
@@ -547,12 +533,6 @@ void RenderTexture::onSaveToFile(const std::string& filename, bool isRGBA)
 /* get buffer as Image */
 Image* RenderTexture::newImage(bool fliimage)
 {
-#if CC_DISABLE_GL_FRAMEBUFFER_OBJECT
-    CC_UNUSED_PARAM(fliimage);
-
-    CCASSERT(0, "framebuffer unsupported");
-    return nullptr;
-#else
     CCASSERT(_pixelFormat == Texture2D::PixelFormat::RGBA8888, "only RGBA8888 can be saved as image");
 
     if (nullptr == _texture)
@@ -625,12 +605,10 @@ Image* RenderTexture::newImage(bool fliimage)
     CC_SAFE_DELETE_ARRAY(tempData);
 
     return image;
-#endif
 }
 
 void RenderTexture::onBegin()
 {
-#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     //
     Director *director = Director::getInstance();
     
@@ -684,12 +662,10 @@ void RenderTexture::onBegin()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _texture->getName(), 0);
     }
-#endif
 }
 
 void RenderTexture::onEnd()
 {
-#if !CC_DISABLE_GL_FRAMEBUFFER_OBJECT
     Director *director = Director::getInstance();
 
     glBindFramebuffer(GL_FRAMEBUFFER, _oldFBO);
@@ -701,7 +677,6 @@ void RenderTexture::onEnd()
     //
     director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, _oldProjMatrix);
     director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, _oldTransMatrix);
-#endif
 }
 
 void RenderTexture::onClear()
