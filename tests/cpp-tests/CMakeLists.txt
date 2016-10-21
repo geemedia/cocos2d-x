@@ -271,6 +271,23 @@ else()
     add_executable(${APP_NAME} ${TESTS_SRC} ${EXTENDED_TESTS_SRC})
 endif()
 
+# Add toolchain link directories separately, because it must be done with a special argument to 'ld'
+foreach(loop_var IN LISTS TOOLCHAIN_LINK_DIRECTORIES)
+  set_property(TARGET ${APP_NAME} APPEND_STRING PROPERTY LINK_FLAGS " -Wl,-Y${loop_var}")
+endforeach(loop_var)
+
+if (LINUX)
+  if (PLATFORM_FREESCALE)
+    target_link_libraries(${APP_NAME} glfw GLESv2 GAL EGL Xrandr Xrender Xxf86vm  expat xcb Xau Xdmcp Xdamage Xfixes Xext Xi iconv z)
+  elseif (PLATFORM_ECO)
+    target_link_libraries(${APP_NAME} glfw GLESv2 EGL IMGegl srv_um Xrandr Xrender Xxf86vm  expat xcb Xau Xdmcp Xdamage Xfixes Xext Xi iconv z)
+  elseif (USE_OPENGLES2)
+    target_link_libraries(${APP_NAME} glfw GLESv2 EGL X11 z)
+  else ()
+    target_link_libraries(${APP_NAME} glfw GLEW GL X11 pthread z)
+  endif ()
+endif()
+
 target_link_libraries(${APP_NAME} cocos2d)
 
 cocos_use_pkg(${APP_NAME} CURL)

@@ -71,8 +71,8 @@ public:
         addTest("Node: Particle3D (PU)", [](){return new Particle3DTests(); });
 #if CC_USE_PHYSICS
         addTest("Node: Physics", []() { return new PhysicsTests(); });
-#endif
         addTest("Node: Physics3D", []() { return new Physics3DTests(); } );
+#endif
         addTest("Node: RenderTexture", [](){return new RenderTextureTests(); });
         addTest("Node: Scene", [](){return new SceneTests(); });
         addTest("Node: Spine", [](){return new SpineTests(); });
